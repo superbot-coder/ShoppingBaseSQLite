@@ -1,0 +1,27 @@
+Key
+Date_to_buy
+Product_Name
+Count
+Cost
+Guarantee
+Data_Guarantee
+Shop_Name
+
+Table Name [BuyTable]
+
+[ id | дата покупки | название товара | количество | цена | срок гарантии | дата истечения гарантии | название магазина | код товара | телефон продавца | имя продавца | ]
+[ id | date_buy | product_name | сount | buy_price | guarantee | guarantee_last_date | shop_name | product_id | customer_tel | name_seller |  ]
+
+Table Name [SellTable]
+[    | Дата продажи | Название товара | Количество | Цена продажи | Телефон покупателя | Имя покупателя | ]
+[ id | date_sell | product_name | count | sell_price | customer_tel | customer_name ]
+
+Table Name [GroupsTable]
+[id | group_name]
+
+Cross [BuySellTable] Buy-Sell CrossBS
+[id | Buy_id | Sell_id]
+
+Cross [BuyGroupTable] CrossBG
+[id | Buy_id | group_id ]
+
