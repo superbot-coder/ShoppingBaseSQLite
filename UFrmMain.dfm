@@ -1,6 +1,7 @@
 object FrmMain: TFrmMain
   Left = 0
   Top = 0
+  Anchors = [akLeft]
   Caption = 'Shopping Base'
   ClientHeight = 805
   ClientWidth = 1288
@@ -15,9 +16,6 @@ object FrmMain: TFrmMain
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  DesignSize = (
-    1288
-    805)
   PixelsPerInch = 96
   TextHeight = 13
   object StatusBar: TStatusBar
@@ -34,215 +32,22 @@ object FrmMain: TFrmMain
         Text = #1057#1091#1084#1084#1072':'
         Width = 150
       end>
-    ExplicitWidth = 967
-  end
-  object PanelEdit: TPanel
-    Left = 0
-    Top = 80
-    Width = 1288
-    Height = 113
-    Align = alCustom
-    Anchors = [akLeft, akTop, akRight]
-    BevelKind = bkFlat
-    BevelOuter = bvNone
-    TabOrder = 0
-    Visible = False
-    ExplicitWidth = 1071
-    DesignSize = (
-      1284
-      109)
-    object Label1: TLabel
-      Left = 16
-      Top = 17
-      Width = 75
-      Height = 13
-      Caption = #1044#1072#1090#1072' '#1087#1086#1082#1091#1087#1082#1080':'
-    end
-    object Label2: TLabel
-      Left = 137
-      Top = 17
-      Width = 91
-      Height = 13
-      Caption = #1053#1072#1079#1074#1072#1085#1080#1077' '#1090#1086#1074#1072#1088#1072':'
-    end
-    object Label3: TLabel
-      Left = 409
-      Top = 17
-      Width = 49
-      Height = 13
-      Caption = #1045#1076#1080#1085#1080#1094#1099':'
-    end
-    object Label4: TLabel
-      Left = 481
-      Top = 17
-      Width = 58
-      Height = 13
-      Caption = #1057#1090#1086#1080#1084#1086#1089#1090#1100':'
-    end
-    object Label5: TLabel
-      Left = 553
-      Top = 17
-      Width = 52
-      Height = 13
-      Caption = #1043#1072#1088#1072#1085#1090#1080#1103':'
-    end
-    object Label6: TLabel
-      Left = 733
-      Top = 17
-      Width = 46
-      Height = 13
-      Caption = #1052#1072#1075#1072#1079#1080#1085':'
-    end
-    object Label7: TLabel
-      Left = 625
-      Top = 17
-      Width = 102
-      Height = 13
-      Caption = #1048#1089#1090#1077#1082#1072#1077#1090' '#1075#1072#1088#1072#1085#1090#1080#1103':'
-    end
-    object lblSellerPhone: TLabel
-      Left = 988
-      Top = 17
-      Width = 78
-      Height = 13
-      Caption = #1058#1077#1083'. '#1087#1088#1086#1076#1072#1074#1094#1072':'
-    end
-    object LblSellerName: TLabel
-      Left = 1083
-      Top = 17
-      Width = 76
-      Height = 13
-      Caption = #1048#1084#1103' '#1055#1088#1086#1076#1072#1074#1094#1072':'
-    end
-    object lblProductId: TLabel
-      Left = 861
-      Top = 17
-      Width = 63
-      Height = 13
-      Caption = #1050#1086#1076' '#1090#1086#1074#1072#1088#1072':'
-    end
-    object dbeProductName: TDBEdit
-      Left = 137
-      Top = 36
-      Width = 266
-      Height = 21
-      DataField = 'product_name'
-      DataSource = DSMain
-      TabOrder = 0
-    end
-    object dbeCount: TDBEdit
-      Left = 409
-      Top = 36
-      Width = 66
-      Height = 21
-      DataField = 'count'
-      DataSource = DSMain
-      TabOrder = 1
-    end
-    object dbeBuyPrice: TDBEdit
-      Left = 481
-      Top = 36
-      Width = 66
-      Height = 21
-      DataField = 'buy_price'
-      DataSource = DSMain
-      TabOrder = 2
-    end
-    object dbeGuaranteePeriod: TDBEdit
-      Left = 553
-      Top = 36
-      Width = 66
-      Height = 21
-      DataField = 'guarantee_period'
-      DataSource = DSMain
-      TabOrder = 3
-    end
-    object DBCmBoxSelectShop: TDBComboBox
-      Left = 733
-      Top = 36
-      Width = 122
-      Height = 21
-      DataField = 'shop_name'
-      DataSource = DSMain
-      Items.Strings = (
-        'DNS'
-        'Technopoint')
-      TabOrder = 4
-    end
-    object DBNavigator: TDBNavigator
-      Left = 16
-      Top = 68
-      Width = 240
-      Height = 25
-      DataSource = DSMain
-      Anchors = [akLeft, akBottom]
-      Enabled = False
-      TabOrder = 5
-      ExplicitTop = 72
-    end
-    object dbeSellerPhone: TDBEdit
-      Left = 988
-      Top = 36
-      Width = 89
-      Height = 21
-      DataField = 'seller_phone'
-      DataSource = DSMain
-      TabOrder = 6
-    end
-    object dbeSellerName: TDBEdit
-      Left = 1083
-      Top = 36
-      Width = 134
-      Height = 21
-      DataField = 'seller_name'
-      DataSource = DSMain
-      TabOrder = 7
-    end
-    object dbeProductId: TDBEdit
-      Left = 861
-      Top = 36
-      Width = 121
-      Height = 21
-      DataField = 'product_id'
-      DataSource = DSMain
-      TabOrder = 8
-    end
-    object jvdpeGuaranteeLastDate: TJvDBDatePickerEdit
-      Left = 625
-      Top = 36
-      Width = 102
-      Height = 21
-      AllowNoDate = True
-      DataField = 'guarantee_last_date'
-      DataSource = DSMain
-      TabOrder = 9
-    end
-    object JvdpeDateBuy: TJvDBDatePickerEdit
-      Left = 14
-      Top = 36
-      Width = 102
-      Height = 21
-      AllowNoDate = True
-      DataField = 'date_buy'
-      DataSource = DSMain
-      TabOrder = 10
-    end
   end
   object PanelSearch: TPanel
     Left = 0
-    Top = 8
-    Width = 1065
-    Height = 66
-    Align = alCustom
+    Top = 0
+    Width = 1288
+    Height = 54
+    Align = alTop
     BevelOuter = bvNone
-    TabOrder = 2
+    TabOrder = 1
     DesignSize = (
-      1065
-      66)
+      1288
+      54)
     object lblEdSearch: TLabeledEdit
       Left = 16
-      Top = 28
-      Width = 225
+      Top = 23
+      Width = 296
       Height = 21
       EditLabel.Width = 34
       EditLabel.Height = 13
@@ -250,96 +55,513 @@ object FrmMain: TFrmMain
       TabOrder = 0
     end
     object BtnSearch: TButton
-      Left = 247
-      Top = 26
+      Left = 326
+      Top = 23
       Width = 75
       Height = 25
       Caption = #1048#1089#1082#1072#1090#1100
       TabOrder = 1
       OnClick = BtnSearchClick
     end
-    object ChBoxEditEnable: TCheckBox
-      Left = 409
-      Top = 30
-      Width = 113
-      Height = 17
-      Caption = #1056#1077#1078#1080#1084' '#1074#1074#1086#1076#1072
-      TabOrder = 2
-      OnClick = ChBoxEditEnableClick
-    end
     object BtnSearchClose: TButton
-      Left = 328
-      Top = 26
+      Left = 407
+      Top = 23
       Width = 75
       Height = 25
       Caption = #1057#1073#1088#1086#1089
-      TabOrder = 3
+      TabOrder = 2
       OnClick = BtnSearchCloseClick
     end
     object CmBoxVclStyle: TComboBox
-      Left = 808
+      Left = 1111
       Top = 23
       Width = 151
       Height = 21
       Style = csDropDownList
       Anchors = [akTop, akRight]
-      TabOrder = 4
+      TabOrder = 3
       OnSelect = CmBoxVclStyleSelect
     end
     object Button1: TButton
-      Left = 542
-      Top = 21
+      Left = 501
+      Top = 23
       Width = 107
       Height = 25
       Caption = 'Button1'
-      TabOrder = 5
+      TabOrder = 4
       OnClick = Button1Click
     end
-    object Button2: TButton
-      Left = 675
-      Top = 21
-      Width = 82
-      Height = 25
-      Caption = 'Button2'
-      TabOrder = 6
-      OnClick = Button2Click
+  end
+  object PageControl: TPageControl
+    Left = 0
+    Top = 54
+    Width = 1288
+    Height = 732
+    ActivePage = TabSheet1
+    Align = alClient
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = #1055#1086#1082#1091#1087#1082#1080
+      object PanelEditBuy: TPanel
+        Left = 0
+        Top = 33
+        Width = 1280
+        Height = 114
+        Align = alTop
+        BevelKind = bkFlat
+        BevelOuter = bvNone
+        TabOrder = 0
+        Visible = False
+        DesignSize = (
+          1276
+          110)
+        object Label1: TLabel
+          Left = 16
+          Top = 17
+          Width = 75
+          Height = 13
+          Caption = #1044#1072#1090#1072' '#1087#1086#1082#1091#1087#1082#1080':'
+        end
+        object Label2: TLabel
+          Left = 130
+          Top = 17
+          Width = 91
+          Height = 13
+          Caption = #1053#1072#1079#1074#1072#1085#1080#1077' '#1090#1086#1074#1072#1088#1072':'
+        end
+        object Label3: TLabel
+          Left = 419
+          Top = 17
+          Width = 49
+          Height = 13
+          Caption = #1045#1076#1080#1085#1080#1094#1099':'
+        end
+        object Label4: TLabel
+          Left = 495
+          Top = 17
+          Width = 58
+          Height = 13
+          Caption = #1057#1090#1086#1080#1084#1086#1089#1090#1100':'
+        end
+        object Label5: TLabel
+          Left = 571
+          Top = 17
+          Width = 52
+          Height = 13
+          Caption = #1043#1072#1088#1072#1085#1090#1080#1103':'
+        end
+        object Label6: TLabel
+          Left = 763
+          Top = 17
+          Width = 46
+          Height = 13
+          Caption = #1052#1072#1075#1072#1079#1080#1085':'
+        end
+        object Label7: TLabel
+          Left = 647
+          Top = 17
+          Width = 102
+          Height = 13
+          Caption = #1048#1089#1090#1077#1082#1072#1077#1090' '#1075#1072#1088#1072#1085#1090#1080#1103':'
+        end
+        object lblSellerPhone: TLabel
+          Left = 997
+          Top = 17
+          Width = 78
+          Height = 13
+          Caption = #1058#1077#1083'. '#1087#1088#1086#1076#1072#1074#1094#1072':'
+        end
+        object LblSellerName: TLabel
+          Left = 1113
+          Top = 17
+          Width = 76
+          Height = 13
+          Caption = #1048#1084#1103' '#1055#1088#1086#1076#1072#1074#1094#1072':'
+        end
+        object lblProductId: TLabel
+          Left = 891
+          Top = 17
+          Width = 63
+          Height = 13
+          Caption = #1050#1086#1076' '#1090#1086#1074#1072#1088#1072':'
+        end
+        object dbeProductName: TDBEdit
+          Left = 130
+          Top = 36
+          Width = 283
+          Height = 21
+          DataField = 'product_name'
+          DataSource = DSBuy
+          TabOrder = 0
+        end
+        object dbeCount: TDBEdit
+          Left = 419
+          Top = 36
+          Width = 70
+          Height = 21
+          DataField = 'count'
+          DataSource = DSBuy
+          TabOrder = 1
+        end
+        object dbeBuyPrice: TDBEdit
+          Left = 495
+          Top = 36
+          Width = 70
+          Height = 21
+          DataField = 'buy_price'
+          DataSource = DSBuy
+          TabOrder = 2
+        end
+        object dbeGuaranteePeriod: TDBEdit
+          Left = 571
+          Top = 36
+          Width = 70
+          Height = 21
+          DataField = 'guarant_period'
+          DataSource = DSBuy
+          TabOrder = 3
+        end
+        object DBCmBoxSelectShop: TDBComboBox
+          Left = 763
+          Top = 36
+          Width = 122
+          Height = 21
+          DataField = 'shop_name'
+          DataSource = DSBuy
+          Items.Strings = (
+            'DNS'
+            'Technopoint')
+          TabOrder = 4
+        end
+        object DBNavigatorBuyTab: TDBNavigator
+          Left = 16
+          Top = 69
+          Width = 240
+          Height = 25
+          DataSource = DSBuy
+          Anchors = [akLeft, akBottom]
+          Enabled = False
+          ConfirmDelete = False
+          TabOrder = 5
+        end
+        object dbeSellerPhone: TDBEdit
+          Left = 997
+          Top = 36
+          Width = 110
+          Height = 21
+          DataField = 'seller_phone'
+          DataSource = DSBuy
+          TabOrder = 6
+        end
+        object dbeSellerName: TDBEdit
+          Left = 1113
+          Top = 36
+          Width = 130
+          Height = 21
+          DataField = 'seller_name'
+          DataSource = DSBuy
+          TabOrder = 7
+        end
+        object dbeProductId: TDBEdit
+          Left = 891
+          Top = 36
+          Width = 100
+          Height = 21
+          DataField = 'product_id'
+          DataSource = DSBuy
+          TabOrder = 8
+        end
+        object jvdpeGuaranteeLastDate: TJvDBDatePickerEdit
+          Left = 647
+          Top = 36
+          Width = 110
+          Height = 21
+          AllowNoDate = True
+          DataField = 'guarant_last_date'
+          DataSource = DSBuy
+          TabOrder = 9
+        end
+        object JvdpeDateBuy: TJvDBDatePickerEdit
+          Left = 14
+          Top = 36
+          Width = 110
+          Height = 21
+          AllowNoDate = True
+          DataField = 'date_buy'
+          DataSource = DSBuy
+          TabOrder = 10
+        end
+      end
+      object JvDBGBuy: TJvDBGrid
+        Left = 0
+        Top = 147
+        Width = 1280
+        Height = 557
+        Align = alClient
+        DataSource = DSBuy
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
+        ReadOnly = True
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        MultiSelect = True
+        TitleArrow = True
+        SelectColumnsDialogStrings.Caption = 'Select columns'
+        SelectColumnsDialogStrings.OK = '&OK'
+        SelectColumnsDialogStrings.NoSelectionWarning = 'At least one column must be visible!'
+        EditControls = <>
+        RowsHeight = 17
+        TitleRowHeight = 17
+      end
+      object PnlBarBuy: TPanel
+        Left = 0
+        Top = 0
+        Width = 1280
+        Height = 33
+        Align = alTop
+        TabOrder = 2
+        DesignSize = (
+          1280
+          33)
+        object SpBtnBuyTabColAutoSize: TSpeedButton
+          Left = 1215
+          Top = 5
+          Width = 23
+          Height = 22
+          Hint = #1040#1074#1090#1086#1084#1072#1090#1080#1095#1077#1089#1082#1080' '#1074#1099#1088#1086#1074#1085#1103#1090#1100' '#1096#1080#1088#1080#1085#1091' '#1082#1086#1083#1086#1085#1086#1082' '#1090#1072#1073#1083#1080#1094#1099
+          Anchors = [akTop, akRight]
+          ImageIndex = 0
+          Images = ImageList16
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = SpBtnBuyTabColAutoSizeClick
+        end
+        object SpBtnBuyTabColSave: TSpeedButton
+          Left = 1245
+          Top = 5
+          Width = 23
+          Height = 22
+          Hint = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1085#1072#1089#1090#1088#1086#1081#1082#1080' '#1082#1086#1083#1086#1085#1086#1082' '#1090#1072#1073#1083#1080#1094#1099
+          Anchors = [akTop, akRight]
+          ImageIndex = 1
+          Images = ImageList16
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = SpBtnBuyTabColSaveClick
+        end
+        object ChBoxBuyTabEditMode: TCheckBox
+          Left = 30
+          Top = 8
+          Width = 179
+          Height = 17
+          Caption = #1056#1077#1078#1080#1084' '#1074#1074#1086#1076#1072' '#1090#1072#1073#1083#1080#1094#1099' '#1087#1086#1082#1091#1087#1086#1082
+          TabOrder = 0
+          OnClick = ChBoxBuyTabEditModeClick
+        end
+      end
     end
-  end
-  object JvDBG: TJvDBGrid
-    Left = 0
-    Top = 199
-    Width = 1288
-    Height = 436
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    DataSource = DSMain
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
-    ReadOnly = True
-    TabOrder = 3
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clWindowText
-    TitleFont.Height = -11
-    TitleFont.Name = 'Tahoma'
-    TitleFont.Style = []
-    MultiSelect = True
-    TitleArrow = True
-    SelectColumnsDialogStrings.Caption = 'Select columns'
-    SelectColumnsDialogStrings.OK = '&OK'
-    SelectColumnsDialogStrings.NoSelectionWarning = 'At least one column must be visible!'
-    EditControls = <>
-    RowsHeight = 17
-    TitleRowHeight = 17
-  end
-  object mm: TMemo
-    Left = 0
-    Top = 641
-    Width = 1288
-    Height = 139
-    Anchors = [akLeft, akRight, akBottom]
-    Lines.Strings = (
-      'mm')
-    ScrollBars = ssVertical
-    TabOrder = 4
-    ExplicitWidth = 1071
+    object TabSheet2: TTabSheet
+      Caption = #1055#1088#1086#1076#1072#1078#1080
+      ImageIndex = 1
+      object JvDBGSell: TJvDBGrid
+        Left = 0
+        Top = 147
+        Width = 1280
+        Height = 557
+        Align = alClient
+        DataSource = DSSell
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        SelectColumnsDialogStrings.Caption = 'Select columns'
+        SelectColumnsDialogStrings.OK = '&OK'
+        SelectColumnsDialogStrings.NoSelectionWarning = 'At least one column must be visible!'
+        EditControls = <>
+        RowsHeight = 17
+        TitleRowHeight = 17
+      end
+      object PnlBarSell: TPanel
+        Left = 0
+        Top = 0
+        Width = 1280
+        Height = 33
+        Align = alTop
+        TabOrder = 1
+        DesignSize = (
+          1280
+          33)
+        object SpBtnSellTabColSave: TSpeedButton
+          Left = 1245
+          Top = 5
+          Width = 23
+          Height = 22
+          Hint = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1085#1072#1089#1090#1088#1086#1081#1082#1080' '#1082#1086#1083#1086#1085#1086#1082' '#1090#1072#1073#1083#1080#1094#1099
+          Anchors = [akRight]
+          ImageIndex = 1
+          Images = ImageList16
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = SpBtnSellTabColSaveClick
+        end
+        object SpBtnSellTabColAutoSize: TSpeedButton
+          Left = 1215
+          Top = 5
+          Width = 23
+          Height = 22
+          Hint = #1040#1074#1090#1086#1084#1072#1090#1080#1095#1077#1089#1082#1080' '#1074#1099#1088#1086#1074#1085#1103#1090#1100' '#1096#1080#1088#1080#1085#1091' '#1082#1086#1083#1086#1085#1086#1082' '#1090#1072#1073#1083#1080#1094#1099
+          Anchors = [akRight]
+          ImageIndex = 0
+          Images = ImageList16
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = SpBtnSellTabColAutoSizeClick
+        end
+        object ChBoxSellTabEditMode: TCheckBox
+          Left = 30
+          Top = 8
+          Width = 179
+          Height = 17
+          Caption = #1056#1077#1078#1080#1084' '#1074#1074#1086#1076#1072' '#1090#1072#1073#1083#1080#1094#1099' '#1087#1088#1086#1076#1072#1078
+          TabOrder = 0
+          OnClick = ChBoxSellTabEditModeClick
+        end
+      end
+      object PanelEditSell: TPanel
+        Left = 0
+        Top = 33
+        Width = 1280
+        Height = 114
+        Align = alTop
+        TabOrder = 2
+        Visible = False
+        object LblSellDate: TLabel
+          Left = 14
+          Top = 17
+          Width = 78
+          Height = 13
+          Caption = #1044#1072#1090#1072' '#1087#1088#1086#1076#1072#1078#1080':'
+        end
+        object lblSellProductName: TLabel
+          Left = 130
+          Top = 17
+          Width = 91
+          Height = 13
+          Caption = #1053#1072#1079#1074#1072#1085#1080#1077' '#1090#1086#1074#1072#1088#1072':'
+        end
+        object lblSellCount: TLabel
+          Left = 451
+          Top = 17
+          Width = 49
+          Height = 13
+          Caption = #1045#1076#1080#1085#1080#1094#1099':'
+        end
+        object LblSellPrice: TLabel
+          Left = 527
+          Top = 17
+          Width = 30
+          Height = 13
+          Caption = #1062#1077#1085#1072':'
+        end
+        object lblBuyerPhone: TLabel
+          Left = 603
+          Top = 17
+          Width = 89
+          Height = 13
+          Caption = #1058#1077#1083'. '#1087#1086#1082#1091#1087#1072#1090#1077#1083#1103':'
+        end
+        object lblBuyerName: TLabel
+          Left = 719
+          Top = 17
+          Width = 86
+          Height = 13
+          Caption = #1048#1084#1103' '#1087#1086#1082#1091#1087#1072#1090#1077#1083#1103':'
+        end
+        object JvDBDatePickerEdit1: TJvDBDatePickerEdit
+          Left = 14
+          Top = 36
+          Width = 110
+          Height = 21
+          AllowNoDate = True
+          DataField = 'date_sell'
+          DataSource = DSSell
+          TabOrder = 0
+        end
+        object dbeSellProductName: TDBEdit
+          Left = 130
+          Top = 36
+          Width = 315
+          Height = 21
+          DataField = 'product_name'
+          DataSource = DSSell
+          TabOrder = 1
+        end
+        object dbeSellCount: TDBEdit
+          Left = 451
+          Top = 36
+          Width = 70
+          Height = 21
+          DataField = 'count'
+          DataSource = DSSell
+          TabOrder = 2
+        end
+        object dbeSellPrice: TDBEdit
+          Left = 527
+          Top = 36
+          Width = 70
+          Height = 21
+          DataField = 'sell_price'
+          DataSource = DSSell
+          TabOrder = 3
+        end
+        object dbeBuyerPhone: TDBEdit
+          Left = 603
+          Top = 36
+          Width = 110
+          Height = 21
+          DataField = 'buyer_phone'
+          DataSource = DSSell
+          TabOrder = 4
+        end
+        object dbeBuyerName: TDBEdit
+          Left = 719
+          Top = 36
+          Width = 130
+          Height = 21
+          DataField = 'bayer_name'
+          DataSource = DSSell
+          TabOrder = 5
+        end
+        object DBNavigatorSellTab: TDBNavigator
+          Left = 14
+          Top = 72
+          Width = 240
+          Height = 25
+          DataSource = DSSell
+          TabOrder = 6
+        end
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = #1088#1072#1079#1085#1086#1077
+      ImageIndex = 2
+      object mm: TMemo
+        Left = 0
+        Top = 0
+        Width = 1280
+        Height = 704
+        Align = alClient
+        Lines.Strings = (
+          'mm')
+        ScrollBars = ssVertical
+        TabOrder = 0
+      end
+    end
   end
   object OpenDialog: TOpenDialog
     Left = 528
@@ -349,24 +571,320 @@ object FrmMain: TFrmMain
     Params.Strings = (
       'LockingMode=Normal'
       'CacheSize=1000'
+      
+        'Database=C:\Users\USER\Documents\ShoppingBaseSave\ShoppingBase.d' +
+        'b3'
       'DriverID=SQLite')
     Connected = True
+    LoginPrompt = False
     Left = 264
     Top = 432
   end
   object FDQ: TFDQuery
+    BeforeDelete = FDQBeforeDelete
     Connection = FDConnection
     Left = 344
     Top = 432
   end
-  object FDQMain: TFDQuery
+  object FDQBuy: TFDQuery
+    BeforeDelete = FDQBeforeDelete
     Connection = FDConnection
     Left = 416
     Top = 432
   end
-  object DSMain: TDataSource
-    DataSet = FDQMain
+  object DSBuy: TDataSource
+    DataSet = FDQBuy
     Left = 488
     Top = 432
+  end
+  object ImageList16: TImageList
+    ColorDepth = cd32Bit
+    Left = 732
+    Top = 290
+    Bitmap = {
+      494C010104001800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000002000000001002000000000000020
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000004B5D4B954C744AC34C744AC34C74
+      4AC34C744AC34C744AC34C744AC34C744AC3497349C39C876DC39C876DC39C87
+      6DC39C876DC39C876DC39C876DC36F655A950000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000004C744AC3449F40FF449F40FF449F
+      40FF449F40FFD79832FFD69730FFD69730FFD59730FFDA9731FFDA9731FFDA97
+      31FFDA9731FFDA9731FFDB9833FF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF449F
+      40FF449F40FF449F40FF449F40FF449F40FF449F40FFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFF00000000000000000000000000000000DA9731FFDA97
+      31FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      000000000000DA9731FFFEFEFEFFEBE9E4FFEBE9E4FFEBE9E4FFEBE9E4FFEBE9
+      E4FFEBE9E4FFFEFEFEFFDA9731FF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFFEFE
+      FEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFE
+      FEFFFEFEFEFFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      000000000000DA9731FFFEFEFEFFE8E6E1FFE9E6E1FFE9E6E1FFE9E6E1FFE9E6
+      E1FFE8E6E1FFFEFEFEFFDA9731FF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFFEFE
+      FEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFE
+      FEFFFEFEFEFFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      000000000000DA9731FFFEFEFEFFE6E3DDFFE6E4DEFFE6E4DEFFE6E4DEFFE6E4
+      DEFFE6E3DDFFFEFEFEFFDA9731FF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFFEFE
+      FEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7
+      CEFFFEFEFEFFDA9731FF00000000000000004C744AC3429D3EFFFECB93FFF8C9
+      8FFFF8C98FFFDA9731FFFAF4EBFFFAF5ECFFFAF5ECFFFAF5ECFFFAF5ECFFFAF5
+      ECFFFAF5ECFFFAF4EBFFDA9731FF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FFF8C9
+      8FFFF8C98FFFF8C98FFFF8C98FFF449F40FF449F40FFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFF00000000000000000000000000000000DA9731FFFEFE
+      FEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7CEFFDBD7
+      CEFFFEFEFEFFDA9731FF00000000000000004C744AC3439E3FFFE8BD89F7E8BE
+      89F7E8BE89F7DA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA97
+      31FFDA9731FFDA9731FFDA9731FF9C876DC30000000000000000F2951EFF0000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000F2951EFF00000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFFEFE
+      FEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFEFEFFFEFE
+      FEFFFEFEFEFFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      000000000000DA9731FFB67B24FFB88637FFC3BEB2FFC3BEB2FFB8B3A7FFAFAA
+      9FFFC9B28FFFDA9731FFDA9731FF9C876DC300000000F2951EFFF2951EFFF295
+      1EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF295
+      1EFFF2951EFFF2951EFFF2951EFF000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFDA97
+      31FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      000000000000DA9731FFB77C25FFBA893DFFC4BDAFFFC4BDAFFF898374FF5852
+      46FFC6B8A0FFDA9731FFDA9731FF9C876DC300000000F2951EFFF2951EFFF295
+      1EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF2951EFFF295
+      1EFFF2951EFFF2951EFFF2951EFF000000000000000000000000449F40FFF8C9
+      8FFFF8C98FFFF8C98FFFF8C98FFF449F40FF449F40FFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFF00000000000000000000000000000000DA9731FFDA97
+      31FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA9731FFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3439E3FFFE8BD89F7E8BE
+      89F7E8BE89F7DA9731FFB77C25FFBA893DFFC4BDAFFFC4BDAFFF9B9487FF7872
+      65FFC6B8A0FFDA9631FFF8C98FFF9C876DC30000000000000000F2951EFF0000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000F2951EFF00000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFB87D
+      26FFB87D26FFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3429D3EFFFECB93FFF8C9
+      8FFFF8C98FFFF8C98FFFF8C98FFF3D9C3CFF3D9C3CFFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFFF8C98FFF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFB87D
+      26FFB87D26FFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFF352F23FFC4BDAFFFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      00000000000000000000F8C98FFF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF0000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      000000000000F8C98FFF00000000000000000000000000000000DA9731FFB87D
+      26FFB87D26FFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFF352F23FFC4BDAFFFDA97
+      31FFDA9731FFDA9731FF00000000000000004C744AC3449F40FF000000000000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      00000000000000000000F8C98FFF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000449F40FF449F
+      40FF449F40FF449F40FF449F40FF449F40FF449F40FFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFF00000000000000000000000000000000DA9731FFB87D
+      26FFB87D26FFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFC4BDAFFFDA97
+      31FFDA9731FF0000000000000000000000004C744AC3449F40FF000000000000
+      0000000000000000000000000000449F40FF449F40FF00000000000000000000
+      00000000000000000000F8C98FFF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000004C744AC3449F40FF449F40FF449F
+      40FF449F40FF449F40FF449F40FF449F40FF3D9C3CFFF8C98FFFF8C98FFFF8C9
+      8FFFF8C98FFFF8C98FFFF8C98FFF9C876DC30000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000004B5D4B954C744AC34C744AC34C74
+      4AC34C744AC34C744AC34C744AC34C744AC3497349C39C876DC39C876DC39C87
+      6DC39C876DC39C876DC39C876DC36F655A950000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000424D3E000000000000003E000000
+      2800000040000000200000000100010000000000000100000000000000000000
+      000000000000000000000000FFFFFF0000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000FFFFFFFF0000FFFFFFFFFFFF0000FFFF
+      C003C0033800FFFFDE7BC0033800FFFFDE7BC0033800FFFFDE7BC0030000FFFF
+      C003C0030000DFFBDE7BC00338008001DE7BC00338008001C003C0030000DFFB
+      DE7BC0030000FFFFDE7BC0033E7CFFFFDE7BC0033E7CFFFFC003C0073E7CFFFF
+      FFFFFFFF0000FFFFFFFFFFFF0000FFFF00000000000000000000000000000000
+      000000000000}
+  end
+  object DSSell: TDataSource
+    DataSet = FDQSell
+    Left = 708
+    Top = 442
+  end
+  object FDQSell: TFDQuery
+    Active = True
+    BeforeDelete = FDQBeforeDelete
+    Connection = FDConnection
+    SQL.Strings = (
+      'SELECT * FROM SellTab')
+    Left = 644
+    Top = 442
   end
 end

@@ -13,7 +13,8 @@ uses
   FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteWrapper.Stat, JvExDBGrids, JvDBGrid, JSON, REST.Json, System.IOUtils,
   Vcl.Grids, Vcl.DBGrids, JvExMask, JvToolEdit, JvMaskEdit, JvCheckedMaskEdit,
-  JvDatePickerEdit, JvDBDatePickerEdit;
+  JvDatePickerEdit, JvDBDatePickerEdit, System.ImageList, Vcl.ImgList,
+  Vcl.Buttons;
 
 type TSortType = (stASC, stDESC);
 type TTablesName = (tnAll, tnBuyTable, tnSellTable, tnGroupsTable,
@@ -22,13 +23,21 @@ type TTablesName = (tnAll, tnBuyTable, tnSellTable, tnGroupsTable,
 type
   TFrmMain = class(TForm)
     OpenDialog: TOpenDialog;
-    PanelEdit: TPanel;
-    dbeProductName: TDBEdit;
-    dbeCount: TDBEdit;
-    dbeBuyPrice: TDBEdit;
-    dbeGuaranteePeriod: TDBEdit;
-    DBCmBoxSelectShop: TDBComboBox;
-    DBNavigator: TDBNavigator;
+    StatusBar: TStatusBar;
+    PanelSearch: TPanel;
+    lblEdSearch: TLabeledEdit;
+    BtnSearch: TButton;
+    BtnSearchClose: TButton;
+    CmBoxVclStyle: TComboBox;
+    FDConnection: TFDConnection;
+    FDQ: TFDQuery;
+    FDQBuy: TFDQuery;
+    DSBuy: TDataSource;
+    Button1: TButton;
+    PageControl: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    PanelEditBuy: TPanel;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -36,38 +45,63 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    StatusBar: TStatusBar;
-    PanelSearch: TPanel;
-    lblEdSearch: TLabeledEdit;
-    BtnSearch: TButton;
-    ChBoxEditEnable: TCheckBox;
-    BtnSearchClose: TButton;
-    CmBoxVclStyle: TComboBox;
-    FDConnection: TFDConnection;
-    FDQ: TFDQuery;
-    FDQMain: TFDQuery;
-    JvDBG: TJvDBGrid;
-    DSMain: TDataSource;
-    Button1: TButton;
-    mm: TMemo;
-    Button2: TButton;
-    dbeSellerPhone: TDBEdit;
     lblSellerPhone: TLabel;
-    dbeSellerName: TDBEdit;
-    dbeProductId: TDBEdit;
     LblSellerName: TLabel;
     lblProductId: TLabel;
+    dbeProductName: TDBEdit;
+    dbeCount: TDBEdit;
+    dbeBuyPrice: TDBEdit;
+    dbeGuaranteePeriod: TDBEdit;
+    DBCmBoxSelectShop: TDBComboBox;
+    DBNavigatorBuyTab: TDBNavigator;
+    dbeSellerPhone: TDBEdit;
+    dbeSellerName: TDBEdit;
+    dbeProductId: TDBEdit;
     jvdpeGuaranteeLastDate: TJvDBDatePickerEdit;
     JvdpeDateBuy: TJvDBDatePickerEdit;
+    JvDBGBuy: TJvDBGrid;
+    PnlBarBuy: TPanel;
+    TabSheet3: TTabSheet;
+    mm: TMemo;
+    ChBoxBuyTabEditMode: TCheckBox;
+    ImageList16: TImageList;
+    JvDBGSell: TJvDBGrid;
+    DSSell: TDataSource;
+    FDQSell: TFDQuery;
+    PnlBarSell: TPanel;
+    ChBoxSellTabEditMode: TCheckBox;
+    PanelEditSell: TPanel;
+    JvDBDatePickerEdit1: TJvDBDatePickerEdit;
+    dbeSellProductName: TDBEdit;
+    dbeSellCount: TDBEdit;
+    dbeSellPrice: TDBEdit;
+    dbeBuyerPhone: TDBEdit;
+    dbeBuyerName: TDBEdit;
+    LblSellDate: TLabel;
+    lblSellProductName: TLabel;
+    lblSellCount: TLabel;
+    LblSellPrice: TLabel;
+    lblBuyerPhone: TLabel;
+    lblBuyerName: TLabel;
+    DBNavigatorSellTab: TDBNavigator;
+    SpBtnBuyTabColAutoSize: TSpeedButton;
+    SpBtnBuyTabColSave: TSpeedButton;
+    SpBtnSellTabColSave: TSpeedButton;
+    SpBtnSellTabColAutoSize: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure CmBoxVclStyleSelect(Sender: TObject);
-    procedure ChBoxEditEnableClick(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
     procedure BtnSearchCloseClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure SpBtnBuyTabColAutoSizeClick(Sender: TObject);
+    procedure SpBtnBuyTabColSaveClick(Sender: TObject);
+    procedure FDQBeforeDelete(DataSet: TDataSet);
+    procedure SpBtnSellTabColSaveClick(Sender: TObject);
+    procedure SpBtnSellTabColAutoSizeClick(Sender: TObject);
+    procedure ChBoxBuyTabEditModeClick(Sender: TObject);
+    procedure ChBoxSellTabEditModeClick(Sender: TObject);
   private
     FSTLog: TStrings;
     FFieldLastSorted: string;
@@ -77,7 +111,7 @@ type
     procedure CreateTables(TabName: TTablesName);
     procedure log(StrValue: String);
     function TableExistes(TableName: String): boolean;
-    procedure SetFieldsDefault;
+    procedure SetFieldsDefault(TabName: TTablesName);
     procedure SaveColumnsSettings;
     procedure LoadColumnsSettings;
   public
@@ -93,16 +127,99 @@ var
   ConnectString : String;
   DBFile        : String;
   DBSaveDir     : String;
-  BuyTabFileColSettings : String;
-  SellTabFileColSettings: String;
+  FileBuyTabColSettings : String;
+  FileSellTabColSettings: String;
 
   arTabNameStr: array[TTablesName] of string =
     ('AllTab', 'BuyTab', 'SellTab', 'GroupsTab', 'BuySellTab', 'BuyGroupTab');
 
-  arBuyTabFields: array[0..10] of string = (
-     'id', 'Дата покупки', 'Название товара', 'Количество', 'Цена',
-     'Срок гарантии', 'Дата истечения гарантии', 'Магазин',
-     'Код товара в магазине', 'Телефон продавца','Имя продавца');
+  arBuyTabFieldsName: array[0..10] of string = (
+    'id',                // ID
+    'date_buy',          // Дата покупки
+    'product_name',      // Название товара
+    'count',             // Количество
+    'buy_price',         // Цена
+    'guarant_period',    // Срок гарантии
+    'guarant_last_date', // Дата истечения гарантии
+    'shop_name',         // Название магазина
+    'product_id',        // Код товара в магазине
+    'seller_phone',      // Телефон продавца
+    'seller_name');      // Имя продавца
+
+  arBuyTabFieldsCaption: array[0..High(arBuyTabFieldsName)] of string = (
+    'ID',
+    'Дата покупки',
+    'Название товара',
+    'Количество',
+    'Цена',
+    'Срок гарантии',
+    'Дата истечения гарантии',
+    'Магазин',
+    'Код товара в магазине',
+    'Телефон продавца',
+    'Имя продавца');
+
+  arBuyFieldsWidth: array[0..High(arBuyTabFieldsName)] of Word = (
+     50,   // 0 ID
+     100,  // 1 Дата покупки
+     300,  // 2 Название товара
+     50,   // 3 Количество
+     100,  // 4 Цена
+     50,   // 5 Срок гарантии
+     100,  // 6 Дата истечения гарантии
+     100,  // 7 Название магазина
+     50,   // 8 Код товара в магазине
+     150,  // 9 Телефон продавца
+     150); // 10 Имя продавца;
+
+  arBuyFieldsAlignment: array[0.. High(arBuyTabFieldsName)] of TAlignment = (
+     taCenter,       // 0 ID
+     taCenter,       // 1 Дата покупки
+     taLeftJustify,  // 2 Название товара
+     taCenter,       // 3 Количество
+     taCenter,       // 4 Цена
+     taCenter,       // 5 Срок гарантии
+     taCenter,       // 6 Дата истечения гарантии
+     taCenter,       // 7 Название магазина
+     taCenter,       // 8 Код товара в магазине
+     taLeftJustify,  // 9 Телефон продавца
+     taLeftJustify); // 10 Имя продавца;
+
+  arSellTabFieldsName: array[0..6] of string = (
+    'id',           // ID
+    'date_sell',    // Дата продажи
+    'product_name', // Название товара
+    'count',        // Количество
+    'sell_price',   // Цена продажи
+    'buyer_phone',  // Телефон покупателя
+    'bayer_name');  // Имя покупателя
+
+  arSellTabFieldsCaption: array[0..High(arSellTabFieldsName)] of string = (
+    'ID',
+    'Дата продажи',
+    'Название товара',
+    'Количество',
+    'Цена продажи',
+    'Телефон покупателя',
+    'Имя покупателя');
+
+  arSellFieldsWidth: array[0..High(arSellTabFieldsName)] of Word = (
+     50,    // 0 ID
+     100,   // 1 Дата продажи
+     300,   // 2 Название товара
+     50,    // 3 Количество
+     100,   // 4 Цена продажи
+     150,   // 5 Телефон покупателя
+     150);  // 6 Имя покупателя
+
+  arSellFieldsAlignment: array[0.. High(arSellTabFieldsName)] of TAlignment = (
+     taCenter,       // 0 ID
+     taCenter,       // 1 Дата продажи
+     taLeftJustify,  // 2 Название товара
+     taCenter,       // 3 Количество
+     taCenter,       // 4 Цена продажи
+     taLeftJustify,  // 5 Телефон покупателя
+     taLeftJustify); // 6 Имя покупателя
 
 
 implementation
@@ -128,30 +245,46 @@ end;
 procedure TFrmMain.BtnSearchClick(Sender: TObject);
 var
   find: string;
+  Query: TFDQuery;
 begin
-{
-  with ADOQuery do
-  begin
-    Close;
-    SQL.Text := 'SELECT * FROM shopping_data ' +
-      'WHERE (Date_to_buy LIKE :p1) ' +
-      'OR (Product_Name LIKE :p2) ' +
-      'OR (Count LIKE :p3) ' +
-      'OR (Cost LIKE :p4) ' +
-      'OR (Guarantee LIKE :p5) ' +
-      'OR (Data_Guarantee LIKE :p6) ' +
-      'OR (Shop_Name LIKE :p7)';
-    Parameters.FindParam('p1').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p2').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p3').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p4').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p5').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p6').Value := '%'+lblEdSearch.Text+'%';
-    Parameters.FindParam('p7').Value := '%'+lblEdSearch.Text+'%';
-    Open;
-    Sort := 'Product_Name ASC'
+
+  case PageControl.ActivePageIndex of
+    0: begin
+         with FDQBuy do
+         begin
+           Close;
+           SQL.Text := 'SELECT * FROM ' + arTabNameStr[tnBuyTable] + ' ' +
+             'WHERE (' + arBuyTabFieldsName[1] + ' LIKE :p1) ' + // 1 Дата покупки
+                'OR (' + arBuyTabFieldsName[2] + ' LIKE :p2) ' + // 2 Название товара
+                'OR (' + arBuyTabFieldsName[3] + ' LIKE :p3) ' + // 3 Количество
+                'OR (' + arBuyTabFieldsName[4] + ' LIKE :p4) ' + // 4 Цена
+                'OR (' + arBuyTabFieldsName[5] + ' LIKE :p5) ' + // 5 Срок гарантии
+                'OR (' + arBuyTabFieldsName[6] + ' LIKE :p6) ' + // 6 Дата истечения гарантии
+                'OR (' + arBuyTabFieldsName[7] + ' LIKE :p7) ' + // 7 Название магазина
+                'OR (' + arBuyTabFieldsName[8] + ' LIKE :p8) ' + // 8 Код товара в магазине
+                'OR (' + arBuyTabFieldsName[9] + ' LIKE :p9) ' + // 9 Телефон продавца
+                'OR (' + arBuyTabFieldsName[10] + ' LIKE :p10) ' + // 10 Имя продавца
+                'ORDER BY product_name ASC';
+           Params.FindParam('p1').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p2').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p3').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p4').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p5').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p6').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p7').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p8').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p9').Value := '%'+lblEdSearch.Text+'%';
+           Params.FindParam('p10').Value := '%'+lblEdSearch.Text+'%';
+           Open;
+         end;
+       end;
+    1: begin
+         //
+       end;
   end;
-  }
+
+
+
   UpdateStatusBar;
 end;
 
@@ -165,6 +298,9 @@ procedure TFrmMain.Button1Click(Sender: TObject);
 var
   i: integer;
 begin
+
+  SaveColumnsSettings;
+
  {
   ADOQuery.SQL.Text := 'SELECT * FROM shopping_data';
   ADOQuery.Open;
@@ -191,23 +327,31 @@ begin
   }
 end;
 
-procedure TFrmMain.Button2Click(Sender: TObject);
+procedure TFrmMain.ChBoxBuyTabEditModeClick(Sender: TObject);
 begin
- //
-end;
-
-procedure TFrmMain.ChBoxEditEnableClick(Sender: TObject);
-begin
-  if ChBoxEditEnable.Checked then
+  if ChBoxBuyTabEditMode.Checked then
   begin
-    DBNavigator.Enabled := true;
-    PanelEdit.Visible   := true;
+    DBNavigatorBuyTab.Enabled := true;
+    PanelEditBuy.Visible      := true;
   end
     else
   begin
-   DBNavigator.Enabled := false;
-   PanelEdit.Visible   := false;
-   UpdateStatusBar;
+   DBNavigatorBuyTab.Enabled := false;
+   PanelEditBuy.Visible      := false;
+  end;
+end;
+
+procedure TFrmMain.ChBoxSellTabEditModeClick(Sender: TObject);
+begin
+  if ChBoxSellTabEditMode.Checked then
+  begin
+    DBNavigatorSellTab.Enabled := true;
+    PanelEditSell.Visible      := true;
+  end
+    else
+  begin
+    DBNavigatorSellTab.Enabled := false;
+    PanelEditSell.Visible      := false;
   end;
 end;
 
@@ -224,17 +368,17 @@ begin
     if TabName in [tnAll, tnBuyTable] then
     begin
       SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnBuyTable] + ' (' +
-                  'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, '+
-                  'date_buy DATE NOT NULL, '       + // Дата покупки
-                  'product_name VARCHAR NOT NULL,' + // Название товара
-                  'count INTEGER NOT NULL, '       + // Количество
-                  'buy_price CURRENCY NOT NULL, '  + // Цена
-                  'guarantee_period INTEGER, '     + // Срок гарантии
-                  'guarantee_last_date DATE, '     + // Дата истечения гарантии
-                  'shop_name VARCHAR, '            + // Название магазина
-                  'product_id INTEGER, '           + // Код товара в магазине
-                  'seller_phone VARCHAR, '         + // Телефон продавца
-                  'seller_name VARCHAR)';            // Имя продавца
+        arBuyTabFieldsName[0] + 'INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, ' +
+        arBuyTabFieldsName[1] + ' DATE NOT NULL, '     + // Дата покупки
+        arBuyTabFieldsName[2] + ' VARCHAR NOT NULL,'   + // Название товара
+        arBuyTabFieldsName[3] + ' INTEGER NOT NULL, '  + // Количество
+        arBuyTabFieldsName[4] + ' CURRENCY NOT NULL, ' + // Цена
+        arBuyTabFieldsName[5] + ' INTEGER, '           + // Срок гарантии
+        arBuyTabFieldsName[6] + ' DATE, '              + // Дата истечения гарантии
+        arBuyTabFieldsName[7] + ' VARCHAR, '           + // Название магазина
+        arBuyTabFieldsName[8] + ' VARCHAR, '           + // Код товара в магазине
+        arBuyTabFieldsName[9] + ' VARCHAR, '           + // Телефон продавца
+        arBuyTabFieldsName[10] + ' VARCHAR)';            // Имя продавца
       ExecSQL;
       log('Create Table Name: ' + arTabNameStr[tnBuyTable]);
     end;
@@ -243,14 +387,13 @@ begin
     if TabName in [tnAll, tnSellTable] then
     begin
       SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnSellTable] + ' (' +
-                  'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
-                  'date_sell DATA, '               + // Дата продажи
-                  'product_name VARCHAR,'          + // Название товара
-                  'count INTEGER, '                + // Количество
-                  'sell_price CURRENCY NOT NULL, ' + // Цена продажи
-                  'buyer_phone VARCHAR, '         + // Телефон покупателя
-                  'bayer_name VARCHAR)';             // Имя покупателя
-
+        arSellTabFieldsName[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
+        arSellTabFieldsName[0] + ' DATA, '              + // Дата продажи
+        arSellTabFieldsName[0] + ' VARCHAR,'            + // Название товара
+        arSellTabFieldsName[0] + ' INTEGER, '           + // Количество
+        arSellTabFieldsName[0] + ' CURRENCY NOT NULL, ' + // Цена продажи
+        arSellTabFieldsName[0] + ' VARCHAR, '           + // Телефон покупателя
+        arSellTabFieldsName[0] + ' VARCHAR)';             // Имя покупателя
       ExecSQL;
       log('Create Table Name: ' + arTabNameStr[tnSellTable]);
     end;
@@ -291,6 +434,13 @@ begin
   end;
 end;
 
+procedure TFrmMain.FDQBeforeDelete(DataSet: TDataSet);
+begin
+  if MessageBox(Handle,
+    PChar('Вы действительно желаете удалить запись?'),
+     PChar(''), MB_ICONWARNING or MB_YESNO) = ID_NO then Abort;
+end;
+
 procedure TFrmMain.FormActivate(Sender: TObject);
 var
   i: SmallInt;
@@ -305,10 +455,12 @@ begin
         CreateTables(TTablesName(i));
     end;
     UpdateMainTable;
-    SetFieldsDefault;
+    SetFieldsDefault(tnAll);
 
-    if FileExists(BuyTabFileColSettings) then
-      JvDBG.Columns.LoadFromFile(BuyTabFileColSettings);
+    if FileExists(FileBuyTabColSettings) then
+      JvDBGBuy.Columns.LoadFromFile(FileBuyTabColSettings);
+    if FileExists(FileSellTabColSettings)  then
+      // JvDBGSell.Columns.LoadFromFile(FileSellTabColSettings);
 
     UpdateStatusBar;
   end;
@@ -330,8 +482,8 @@ begin
 
   DBSaveDir := GetEnvironmentVariable('USERPROFILE') + '\Documents\ShoppingBaseSave';
   DBFile    := DBSaveDir + '\ShoppingBase.db3';
-  BuyTabFileColSettings  := DBSaveDir + '\BuyTabColumnsSettings.data';
-  SellTabFileColSettings := DBSaveDir + '\SellTabColumnsSettings.data';
+  FileBuyTabColSettings  := DBSaveDir + '\BuyTabColumnsSettings.data';
+  FileSellTabColSettings := DBSaveDir + '\SellTabColumnsSettings.data';
 
   if Not DirectoryExists(DBSaveDir) then ForceDirectories(DBSaveDir);
   FDConnection.Params.Database := DBFile;
@@ -339,8 +491,8 @@ begin
   //JvDBG.Align := alTop;
   //mm.Align    := alBottom;
 
-  PanelEdit.Align   := alTop;
-  PanelSearch.Align := alTop;
+  PanelEditBuy.Align := alTop;
+  PanelSearch.Align  := alTop;
   //AddShops;
   //BtnSearchCloseClick(Nil);
 
@@ -368,7 +520,7 @@ begin
   //ShowMessage(RootArray.ToString);
 
   try
-    STInp.LoadFromFile(BuyTabFileColSettings + '_');
+    STInp.LoadFromFile(FileBuyTabColSettings + '_');
     jtxt := STInp.Text;
     // mm.Lines.Add(STInp.Text);
     // RootObj := TJSONObject.ParseJSONValue(STInp.Text) as TJSONObject;
@@ -398,8 +550,8 @@ begin
   //RootArray := RootObj as TJSONArray;
 
 
-  RootArray := TJSONObject.ParseJSONValue(TFile.ReadAllBytes(BuyTabFileColSettings + '_'), 0) as TJSONArray;
-  jtxt := TFile.ReadAllText(BuyTabFileColSettings+'_', TEncoding.UTF8);
+  RootArray := TJSONObject.ParseJSONValue(TFile.ReadAllBytes(FileBuyTabColSettings + '_'), 0) as TJSONArray;
+  jtxt := TFile.ReadAllText(FileBuyTabColSettings+'_', TEncoding.UTF8);
 
   if RootArray = Nil then
   begin
@@ -431,15 +583,15 @@ begin
   arColumns := TJSONArray.Create;
   try
 
-    for i := 0 to JvDBG.Columns.Count -1 do
+    for i := 0 to JvDBGBuy.Columns.Count -1 do
     begin
       ColObj    := TJSONObject.Create;
-      ColObj.AddPair('title_caption', JvDBG.Columns.Items[i].Title.Caption)
-            .AddPair('field_name', JvDBG.Columns.Items[i].FieldName)
-            .AddPair('title_alignment', TJSONNumber.Create(ord(JvDBG.Columns.Items[i].Title.Alignment)))
-            .AddPair('alignment', TJSONNumber.Create(ord(JvDBG.Columns.Items[i].Alignment)))
-            .AddPair('width', TJSONNumber.Create(JvDBG.Columns.Items[i].Width))
-            .AddPair('visible', TJSONBool.Create(JvDBG.Columns.Items[i].visible));
+      ColObj.AddPair('title_caption', JvDBGBuy.Columns.Items[i].Title.Caption)
+            .AddPair('field_name', JvDBGBuy.Columns.Items[i].FieldName)
+            .AddPair('title_alignment', TJSONNumber.Create(ord(JvDBGBuy.Columns.Items[i].Title.Alignment)))
+            .AddPair('alignment', TJSONNumber.Create(ord(JvDBGBuy.Columns.Items[i].Alignment)))
+            .AddPair('width', TJSONNumber.Create(JvDBGBuy.Columns.Items[i].Width))
+            .AddPair('visible', TJSONBool.Create(JvDBGBuy.Columns.Items[i].visible));
       arColumns.Add(ColObj);
     end;
 
@@ -449,111 +601,76 @@ begin
     RootArray.Add(TabColObj);
 
     // TFile.WriteAllText(FileColSettings, RootArray.ToJSON);
-    TFile.WriteAllText(BuyTabFileColSettings + '_', TJSON.Format(RootArray));
+
+    TFile.WriteAllText(ChangeFileExt(FileBuyTabColSettings, '.json'), TJSON.Format(RootArray));
 
   finally
     RootArray.Free;
   end;
 end;
 
-procedure TFrmMain.SetFieldsDefault;
+procedure TFrmMain.SetFieldsDefault(TabName: TTablesName);
 var
-  col: TColumn;
   i: ShortInt;
 begin
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'id';
-  col.Title.Caption    := 'ID';
-  col.Width            := 50;
-  col.Visible          := false;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'date_buy';
-  col.Title.Caption    := arBuyTabFields[1];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 100;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'product_name';
-  col.Title.Caption    := arBuyTabFields[2];
-  //col.Title.Alignment  := taCenter;
-  //col.Alignment        := taCenter;
-  col.Width            := 300;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'count';
-  col.Title.Caption    := arBuyTabFields[3];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 50;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'buy_price';
-  col.Title.Caption    := arBuyTabFields[4];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 100;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'guarantee_period';
-  col.Title.Caption    := arBuyTabFields[5];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 50;
-  col.Visible          := false;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'guarantee_last_date';
-  col.Title.Caption    := arBuyTabFields[6];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 100;
-  col.Visible          := false;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'shop_name';
-  col.Title.Caption    := arBuyTabFields[7];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 100;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'product_id';
-  col.Title.Caption    := arBuyTabFields[8];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 50;
-  col.Visible          := false;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'seller_phone';
-  col.Title.Caption    := arBuyTabFields[9];
-  col.Title.Alignment  := taCenter;
-  col.Alignment        := taCenter;
-  col.Width            := 150;
-  col.Visible          := true;
-
-  col := JvDBG.Columns.Add;
-  col.FieldName        := 'seller_name';
-  col.Title.Caption    := arBuyTabFields[10];
-  //col.Title.Alignment  := taCenter;
-  //col.Alignment        := taCenter;
-  col.Width            := 150;
-  col.Visible          := true;
-
-  for i := 0 to JvDBG.Columns.Count-1 do
+  if TabName in [tnAll, tnBuyTable] then
   begin
-    JvDBG.Columns.Items[i].Title.Font.Style := [fsBold];
-    JvDBG.Columns.Items[i].Title.Font.Size  := 10;
+    for i := 0 to High(arBuyTabFieldsName)-1 do
+    begin
+      with JvDBGBuy.Columns.Add do
+      begin
+        FieldName        := arBuyTabFieldsName[i];
+        Title.Caption    := arBuyTabFieldsCaption[i];
+        Title.Alignment  := arBuyFieldsAlignment[i];
+        Title.Font.Style := [fsBold];
+        //Title.Font.Size  := 10;
+        Alignment        := arBuyFieldsAlignment[i];
+        Width            := arBuyFieldsWidth[i];
+        if i = 0 then Visible := false else Visible := true;
+      end;
+    end;
   end;
 
+  if TabName in [tnAll, tnSellTable] then
+  begin
+    for i := 0 to Length(arSellTabFieldsName) -1 do
+    begin
+      with JvDBGSell.Columns.Add do
+      begin
+        FieldName        := arSellTabFieldsName[i];
+        Title.Caption    := arSellTabFieldsCaption[i];
+        Title.Font.Style := [fsBold];
+        //Title.Font.Size  := 10;
+        Title.Alignment  := arSellFieldsAlignment[i];
+        Alignment        := arSellFieldsAlignment[i];
+        Width            := arSellFieldsWidth[i];
+        if i = 0 then Visible := false else Visible := true;
+      end;
+    end;
+  end;
+
+end;
+
+procedure TFrmMain.SpBtnBuyTabColAutoSizeClick(Sender: TObject);
+begin
+  JvDBGBuy.AutoSizeColumns := true;
+  JvDBGBuy.AutoSizeColumns := false;
+end;
+
+procedure TFrmMain.SpBtnBuyTabColSaveClick(Sender: TObject);
+begin
+  JvDBGBuy.Columns.SaveToFile(FileBuyTabColSettings);
+end;
+
+procedure TFrmMain.SpBtnSellTabColAutoSizeClick(Sender: TObject);
+begin
+  JvDBGSell.AutoSizeColumns := true;
+  JvDBGSell.AutoSizeColumns := false;
+end;
+
+procedure TFrmMain.SpBtnSellTabColSaveClick(Sender: TObject);
+begin
+  JvDBGSell.Columns.SaveToFile(FileSellTabColSettings);
 end;
 
 function TFrmMain.TableExistes(TableName: String): boolean;
@@ -566,26 +683,27 @@ end;
 
 procedure TFrmMain.UpdateMainTable;
 begin
-  FDQMain.SQL.Text := 'SELECT * FROM BuyTab';
-  FDQMain.Open;
+  FDQBuy.SQL.Text := 'SELECT * FROM BuyTab';
+  FDQBuy.Open;
 end;
 
 procedure TFrmMain.UpdateStatusBar;
 var
   i: Integer;
 begin
-  JvDBG.BeginUpdate;
+  JvDBGBuy.BeginUpdate;
+  DSBuy.Enabled := false;
   i := 0;
-  FDQMain.First;
-  while FDQMain.Eof = false do
+  FDQBuy.First;
+  while FDQBuy.Eof = false do
   begin
-    i := i + FDQMain.FieldByName('buy_price').AsInteger;
-    FDQMain.Next;
+    i := i + FDQBuy.FieldByName('buy_price').AsInteger;
+    FDQBuy.Next;
   end;
-  FDQMain.First;
-  JvDBG.EndUpdate;
-
-  StatusBar.Panels[0].Text := 'Записей: ' + IntToStr(FDQMain.RecordCount);
+  FDQBuy.First;
+  DSBuy.Enabled := true;
+  JvDBGBuy.EndUpdate;
+  StatusBar.Panels[0].Text := 'Записей: ' + IntToStr(FDQBuy.RecordCount);
   StatusBar.Panels[1].Text := 'Сумма: ' + IntToStr(i);
 end;
 
