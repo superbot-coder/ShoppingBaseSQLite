@@ -104,7 +104,6 @@ object FrmMain: TFrmMain
       Height = 25
       Caption = 'BtnTest'
       TabOrder = 4
-      Visible = False
       OnClick = BtnTestClick
     end
     object JvChCmBoxFieldsSearch: TJvCheckedComboBox
@@ -132,13 +131,11 @@ object FrmMain: TFrmMain
     Left = 0
     Top = 83
     Width = 1288
-    Height = 561
+    Height = 563
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 2
     OnChange = PageControlChange
-    ExplicitTop = 77
-    ExplicitHeight = 533
     object TabSheet1: TTabSheet
       Caption = #1055#1086#1082#1091#1087#1082#1080
       object PanelEditBuy: TPanel
@@ -147,13 +144,12 @@ object FrmMain: TFrmMain
         Width = 1280
         Height = 168
         Align = alTop
-        BevelKind = bkFlat
         BevelOuter = bvNone
         TabOrder = 0
         Visible = False
         DesignSize = (
-          1276
-          164)
+          1280
+          168)
         object Label1: TLabel
           Left = 16
           Top = 17
@@ -285,7 +281,7 @@ object FrmMain: TFrmMain
         end
         object DBNavigatorBuyTab: TDBNavigator
           Left = 14
-          Top = 132
+          Top = 136
           Width = 440
           Height = 25
           DataSource = DSBuy
@@ -400,7 +396,7 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 201
         Width = 1280
-        Height = 332
+        Height = 334
         Align = alClient
         DataSource = DSBuy
         Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
@@ -430,6 +426,7 @@ object FrmMain: TFrmMain
         Width = 1280
         Height = 33
         Align = alTop
+        BevelOuter = bvNone
         TabOrder = 2
         DesignSize = (
           1280
@@ -461,13 +458,22 @@ object FrmMain: TFrmMain
           OnClick = SpBtnBuyTabColSaveClick
         end
         object ChBoxBuyTabEditMode: TCheckBox
-          Left = 30
-          Top = 8
+          Left = 32
+          Top = 10
           Width = 179
           Height = 17
           Caption = #1056#1077#1078#1080#1084' '#1074#1074#1086#1076#1072' '#1090#1072#1073#1083#1080#1094#1099' '#1087#1086#1082#1091#1087#1086#1082
           TabOrder = 0
           OnClick = ChBoxBuyTabEditModeClick
+        end
+        object ChBoxImagesViewer: TCheckBox
+          Left = 260
+          Top = 10
+          Width = 193
+          Height = 17
+          Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1082#1072#1088#1090#1080#1085#1082#1080
+          TabOrder = 1
+          OnClick = ChBoxImagesViewerClick
         end
       end
     end
@@ -478,7 +484,7 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 147
         Width = 1280
-        Height = 386
+        Height = 388
         Align = alClient
         DataSource = DSSell
         TabOrder = 0
@@ -664,6 +670,7 @@ object FrmMain: TFrmMain
         Width = 1280
         Height = 473
         Align = alTop
+        Enabled = False
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -679,20 +686,23 @@ object FrmMain: TFrmMain
   end
   object JvImagesViewer: TJvImagesViewer
     Left = 0
-    Top = 644
+    Top = 646
     Width = 1288
-    Height = 142
-    HorzScrollBar.Range = 600
+    Height = 140
+    HorzScrollBar.Range = 610
     HorzScrollBar.Tracking = True
     VertScrollBar.Range = 120
     VertScrollBar.Tracking = True
     VertScrollBar.Visible = False
-    Directory = 'C:\Users\USER\Documents\ShoppingBaseSave\Images'
+    Directory = 'C:\Users\USER\Documents\ShoppingBaseSave\Images\0176716'
     FileMask = 
       '*.wbmp;*.webp;*.svg;*.gif;*.cur;*.pcx;*.ani;*.png;*.gif;*.jpg;*.' +
       'jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff,*.webp'
-    Options.AutoCenter = False
-    Options.HorzSpacing = 0
+    Options.AutoCenter = True
+    Options.BrushPattern.EvenColor = clBtnFace
+    Options.FrameColor = clNone
+    Options.HorzSpacing = 2
+    Options.HotFrameSize = 0
     Options.HotTrack = False
     Options.ImagePadding = 2
     Options.MultiSelect = False
@@ -702,9 +712,21 @@ object FrmMain: TFrmMain
     Options.VertSpacing = 0
     SelectedIndex = -1
     Align = alBottom
-    ParentColor = True
+    Color = clGradientActiveCaption
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = False
     TabOrder = 3
     TabStop = True
+    Visible = False
+    ExplicitLeft = 1148
+    ExplicitTop = 83
+    ExplicitWidth = 703
   end
   object OpenDialog: TOpenDialog
     Left = 576
@@ -714,9 +736,6 @@ object FrmMain: TFrmMain
     Params.Strings = (
       'LockingMode=Normal'
       'CacheSize=1000'
-      
-        'Database=C:\Users\USER\Documents\ShoppingBaseSave\ShoppingBase.d' +
-        'b3'
       'DriverID=SQLite')
     FormatOptions.AssignedValues = [fvFmtDisplayDate]
     FormatOptions.FmtDisplayDate = 'DD.MM.YYYY'

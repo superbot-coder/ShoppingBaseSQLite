@@ -19,6 +19,7 @@ type
     FDTGroups: TFDTable;
     DSGroups: TDataSource;
     procedure FormCreate(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -34,19 +35,15 @@ USES UFrmMain;
 
 {$R *.dfm}
 
+procedure TFrmEditGroups.FormActivate(Sender: TObject);
+begin
+  if Not FrmMain.FDConnection.Connected then Exit;
+  if not FDTGroups.Active then FDTGroups.Open;
+end;
+
 procedure TFrmEditGroups.FormCreate(Sender: TObject);
 begin
-
-  if FrmMain.FDConnection.Connected then
-  begin
-    FDTGroups.Connection := FrmMain.FDConnection;
-    FDTGroups.TableName  := arTabNameStr[tnGroupsTable];
-    FDTGroups.Active     := True;
-
-
-
-  end;
-
+  FDTGroups.TableName  := arTabNameStr[tnGroupsTable];
 end;
 
 end.

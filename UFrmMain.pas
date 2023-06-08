@@ -16,7 +16,7 @@ uses
   JvDatePickerEdit, JvDBDatePickerEdit, System.ImageList, Vcl.ImgList,
   Vcl.Buttons, JvCombobox, System.DateUtils, System.StrUtils, Vcl.Menus,
   Winapi.ShellAPI, Vcl.CheckLst, JvExCheckLst, JvCheckListBox, JvExForms,
-  JvCustomItemViewer, JvImagesViewer, Skia.Vcl;
+  JvCustomItemViewer, JvImagesViewer, skia.Vcl;
 
 type TSortType = (stASC, stDESC);
 type TTablesName = (tnAll, tnBuyTable, tnSellTable, tnGroupsTable,
@@ -106,6 +106,7 @@ type
     DBMemoWebPage: TDBMemo;
     PM_CloneRecord: TMenuItem;
     JvImagesViewer: TJvImagesViewer;
+    ChBoxImagesViewer: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure CmBoxVclStyleSelect(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
@@ -132,6 +133,7 @@ type
     procedure DBMemoWebPageChange(Sender: TObject);
     procedure PM_CloneRecordClick(Sender: TObject);
     procedure JvDBGBuyCellClick(Column: TColumn);
+    procedure ChBoxImagesViewerClick(Sender: TObject);
   private
     FSTLog: TStrings;
     FFieldLastSorted: string;
@@ -435,6 +437,8 @@ end;
 procedure TFrmMain.BtnTestClick(Sender: TObject);
 begin
 
+
+
   //SetDBEditControls(tnBuyTable);
   //UpdateControlSelectedGroups;
   //SetCheckedSelectedGroups(1);
@@ -463,6 +467,8 @@ begin
 
   UpdateMainTable;
   }
+
+  mm.Lines.AddStrings(FSTLog);
 end;
 
 procedure TFrmMain.ChBoxBuyTabEditModeClick(Sender: TObject);
@@ -479,6 +485,14 @@ begin
    DBNavigatorBuyTab.Enabled := false;
    PanelEditBuy.Visible      := false;
   end;
+end;
+
+procedure TFrmMain.ChBoxImagesViewerClick(Sender: TObject);
+begin
+  if ChBoxImagesViewer.Checked then
+    JvImagesViewer.Visible := true
+  else
+    JvImagesViewer.Visible := false;
 end;
 
 procedure TFrmMain.ChBoxSellTabEditModeClick(Sender: TObject);
@@ -508,7 +522,7 @@ begin
     if TabName in [tnAll, tnBuyTable] then
     begin
       SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnBuyTable] + ' (' +
-        arBuyTabFieldsName[0] + 'INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, ' +
+        arBuyTabFieldsName[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, ' +
         arBuyTabFieldsName[1] + ' DATE NOT NULL, '     + // Дата покупки
         arBuyTabFieldsName[2] + ' VARCHAR NOT NULL,'   + // Название товара
         arBuyTabFieldsName[3] + ' INTEGER NOT NULL, '  + // Количество
@@ -529,12 +543,12 @@ begin
     begin
       SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnSellTable] + ' (' +
         arSellTabFieldsName[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
-        arSellTabFieldsName[0] + ' DATA, '              + // Дата продажи
-        arSellTabFieldsName[0] + ' VARCHAR,'            + // Название товара
-        arSellTabFieldsName[0] + ' INTEGER, '           + // Количество
-        arSellTabFieldsName[0] + ' CURRENCY NOT NULL, ' + // Цена продажи
-        arSellTabFieldsName[0] + ' VARCHAR, '           + // Телефон покупателя
-        arSellTabFieldsName[0] + ' VARCHAR)';             // Имя покупателя
+        arSellTabFieldsName[1] + ' DATA, '              + // Дата продажи
+        arSellTabFieldsName[2] + ' VARCHAR,'            + // Название товара
+        arSellTabFieldsName[3] + ' INTEGER, '           + // Количество
+        arSellTabFieldsName[4] + ' CURRENCY NOT NULL, ' + // Цена продажи
+        arSellTabFieldsName[5] + ' VARCHAR, '           + // Телефон покупателя
+        arSellTabFieldsName[6] + ' VARCHAR)';             // Имя покупателя
       ExecSQL;
       log('Create Table Name: ' + arTabNameStr[tnSellTable]);
     end;
@@ -647,13 +661,14 @@ procedure TFrmMain.FormActivate(Sender: TObject);
 var
   i: SmallInt;
 begin
+  FDConnection.Open;
 
   if FDConnection.Connected then
   begin
-    for i := 0 to length(arTabNameStr) -1 do
+    for i := 0 to Length(arTabNameStr) -1 do
     begin
       if i = 0 then Continue;
-      if Not TableExistes(arTabNameStr[TTablesName(i)]) then
+      if TableExistes(arTabNameStr[TTablesName(i)]) = false then
         CreateTables(TTablesName(i));
     end;
 
@@ -664,6 +679,7 @@ begin
     UpdateControlSelectedGroups;
     SetFieldsDefault(tnAll);
     SetFeldsSearch(tnBuyTable);
+    FDTGroups.Open;
 
     if FileExists(FileBuyTabColSettings) then
       JvDBGBuy.Columns.LoadFromFile(FileBuyTabColSettings);
@@ -673,7 +689,6 @@ begin
     UpdateStatusBar;
   end;
 
-  //ShowMessage(IntToStr(JvDBG.FieldCount));
 end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
@@ -695,14 +710,14 @@ begin
   FileSellTabColSettings := DBSaveDir + '\SellTabColumnsSettings.data';
 
   if Not DirectoryExists(DBSaveDir) then ForceDirectories(DBSaveDir);
+
   FDConnection.Params.Database := DBFile;
-  FDConnection.Open;
+
   //JvDBG.Align := alTop;
-  //mm.Align    := alBottom;
 
   PanelEditBuy.Align := alTop;
   PanelSearch.Align  := alTop;
-  //AddShops;
+
   //BtnSearchCloseClick(Nil);
 
 end;
@@ -726,13 +741,13 @@ procedure TFrmMain.JvDBGBuyCellClick(Column: TColumn);
 var
   DirImages: String;
 begin
-  if FDQBuy.IsEmpty then Exit;
+  if FDQBuy.IsEmpty or (not ChBoxImagesViewer.Checked) then Exit;
   DirImages := FDQBuy.FieldByName(arBuyTabFieldsName[8]).AsString;
   if DirImages = '' then
      DirImages := 'ID_' + FDQBuy.FieldByName(arBuyTabFieldsName[0]).AsString;
 
   DirImages := DBImagesDir + '\' + DirImages;
-  if DirectoryExists(DirImages) then JvImagesViewer.Directory := DirImages;
+  JvImagesViewer.Directory := DirImages;
 end;
 
 procedure TFrmMain.jvdpeGuaranteeLastDateClick(Sender: TObject);
@@ -1117,10 +1132,14 @@ end;
 
 function TFrmMain.TableExistes(TableName: String): boolean;
 begin
-  FDQ.SQL.text := 'SELECT * FROM sqlite_master WHERE Name = :p1';
-  FDQ.Params[0].Value := TableName;
-  FDQ.Open;
-  Result := Not FDQ.IsEmpty;
+  try
+    FDQ.SQL.text := 'SELECT * FROM sqlite_master WHERE Name = :p1';
+    FDQ.Params[0].Value := TableName;
+    FDQ.Open;
+    Result := Not FDQ.IsEmpty;
+  Except
+    Result := false;
+  end;
 end;
 
 procedure TFrmMain.UpdateMainTable;
