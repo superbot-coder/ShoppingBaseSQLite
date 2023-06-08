@@ -4,14 +4,18 @@ uses
   Vcl.Forms,
   UFrmMain in 'UFrmMain.pas' {FrmMain},
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  UFrmEditGroups in 'UFrmEditGroups.pas' {FrmEditGroups},
+  UFrmSelectWebPage in 'UFrmSelectWebPage.pas' {FrmSelectWebPage};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  TStyleManager.TrySetStyle('Calypso');
+  TStyleManager.TrySetStyle('Iceberg Classico');
   Application.CreateForm(TFrmMain, FrmMain);
+  Application.CreateForm(TFrmEditGroups, FrmEditGroups);
+  Application.CreateForm(TFrmSelectWebPage, FrmSelectWebPage);
   Application.Run;
 end.

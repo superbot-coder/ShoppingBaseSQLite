@@ -110,6 +110,14 @@
             <Form>FrmMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="UFrmEditGroups.pas">
+            <Form>FrmEditGroups</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="UFrmSelectWebPage.pas">
+            <Form>FrmSelectWebPage</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -131,11 +139,18 @@
                     <Source Name="MainSource">ShoppingBase.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\21.0\bpl\ComPortDrvD270.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\21.0\bpl\ComPortDrvD270.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="Win32\Release\ShoppingBase.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>ShoppingBase.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\ShoppingBase.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ShoppingBase.exe</RemoteName>
