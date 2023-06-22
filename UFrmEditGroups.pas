@@ -37,8 +37,9 @@ USES UFrmMain;
 
 procedure TFrmEditGroups.FormActivate(Sender: TObject);
 begin
+  FrmMain.mm.Lines.Add('TFrmEditGroups.FormActivate');
   if Not FrmMain.FDConnection.Connected then Exit;
-  if not FDTGroups.Active then FDTGroups.Open;
+  if Not FDTGroups.Active then FDTGroups.Open;
 end;
 
 procedure TFrmEditGroups.FormCreate(Sender: TObject);

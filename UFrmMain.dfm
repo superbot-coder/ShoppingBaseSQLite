@@ -11,6 +11,7 @@ object FrmMain: TFrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = MainMenu
   OldCreateOrder = False
   Position = poScreenCenter
   OnActivate = FormActivate
@@ -42,9 +43,6 @@ object FrmMain: TFrmMain
     BevelKind = bkFlat
     BevelOuter = bvNone
     TabOrder = 1
-    DesignSize = (
-      1284
-      79)
     object lblSelectFieldsSearch: TLabel
       Left = 488
       Top = 24
@@ -87,25 +85,6 @@ object FrmMain: TFrmMain
       TabOrder = 2
       OnClick = BtnSearchCloseClick
     end
-    object CmBoxVclStyle: TComboBox
-      Left = 1117
-      Top = 11
-      Width = 155
-      Height = 21
-      Style = csDropDownList
-      Anchors = [akTop, akRight]
-      TabOrder = 3
-      OnSelect = CmBoxVclStyleSelect
-    end
-    object BtnTest: TButton
-      Left = 1117
-      Top = 38
-      Width = 107
-      Height = 25
-      Caption = 'BtnTest'
-      TabOrder = 4
-      OnClick = BtnTestClick
-    end
     object JvChCmBoxFieldsSearch: TJvCheckedComboBox
       Left = 488
       Top = 40
@@ -114,7 +93,7 @@ object FrmMain: TFrmMain
       CapSelectAll = '&Select all'
       CapDeSelectAll = '&Deselect all'
       CapInvertAll = '&Invert all'
-      TabOrder = 5
+      TabOrder = 3
     end
     object JvChCmBoxViewSelectedGroups: TJvCheckedComboBox
       Left = 827
@@ -124,14 +103,14 @@ object FrmMain: TFrmMain
       CapSelectAll = '&Select all'
       CapDeSelectAll = '&Deselect all'
       CapInvertAll = '&Invert all'
-      TabOrder = 6
+      TabOrder = 4
     end
   end
   object PageControl: TPageControl
     Left = 0
     Top = 83
     Width = 1288
-    Height = 563
+    Height = 549
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 2
@@ -248,7 +227,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'product_name'
           DataSource = DSBuy
-          TabOrder = 0
+          TabOrder = 1
         end
         object dbeCount: TDBEdit
           Left = 459
@@ -257,7 +236,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'count'
           DataSource = DSBuy
-          TabOrder = 1
+          TabOrder = 2
         end
         object dbeBuyPrice: TDBEdit
           Left = 520
@@ -266,7 +245,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'buy_price'
           DataSource = DSBuy
-          TabOrder = 2
+          TabOrder = 3
         end
         object DBCmBoxSelectShop: TDBComboBox
           Left = 763
@@ -277,7 +256,7 @@ object FrmMain: TFrmMain
           DataSource = DSBuy
           Items.Strings = (
             '')
-          TabOrder = 3
+          TabOrder = 6
         end
         object DBNavigatorBuyTab: TDBNavigator
           Left = 14
@@ -288,7 +267,7 @@ object FrmMain: TFrmMain
           Anchors = [akLeft, akBottom]
           Enabled = False
           ConfirmDelete = False
-          TabOrder = 4
+          TabOrder = 12
           OnClick = DBNavigatorBuyTabClick
         end
         object dbeSellerPhone: TDBEdit
@@ -298,7 +277,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'seller_phone'
           DataSource = DSBuy
-          TabOrder = 5
+          TabOrder = 8
         end
         object dbeSellerName: TDBEdit
           Left = 1113
@@ -307,7 +286,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'seller_name'
           DataSource = DSBuy
-          TabOrder = 6
+          TabOrder = 9
         end
         object dbeProductId: TDBEdit
           Left = 891
@@ -326,7 +305,7 @@ object FrmMain: TFrmMain
           AllowNoDate = True
           DataField = 'guarant_last_date'
           DataSource = DSBuy
-          TabOrder = 8
+          TabOrder = 5
           OnClick = jvdpeGuaranteeLastDateClick
         end
         object JvdpeDateBuy: TJvDBDatePickerEdit
@@ -337,7 +316,7 @@ object FrmMain: TFrmMain
           AllowNoDate = True
           DataField = 'date_buy'
           DataSource = DSBuy
-          TabOrder = 9
+          TabOrder = 0
         end
         object DBCmBoxGuarantPeriod: TDBComboBox
           Left = 596
@@ -346,7 +325,7 @@ object FrmMain: TFrmMain
           Height = 21
           DataField = 'guarant_period'
           DataSource = DSBuy
-          TabOrder = 10
+          TabOrder = 4
           OnChange = DBCmBoxGuarantPeriodChange
         end
         object JvChCmBoxSelectGroups: TJvCheckedComboBox
@@ -365,19 +344,8 @@ object FrmMain: TFrmMain
           Width = 109
           Height = 25
           Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1075#1088#1091#1087#1087#1099
-          TabOrder = 12
-          OnClick = BtnSetGroupClick
-        end
-        object dbeWebPage: TDBEdit
-          Left = 147
-          Top = 63
-          Width = 345
-          Height = 21
-          DataField = 'web_page'
-          DataSource = DSBuy
           TabOrder = 13
-          Visible = False
-          OnChange = dbeWebPageChange
+          OnClick = BtnSetGroupClick
         end
         object DBMemoWebPage: TDBMemo
           Left = 12
@@ -387,7 +355,7 @@ object FrmMain: TFrmMain
           DataField = 'web_page'
           DataSource = DSBuy
           ScrollBars = ssVertical
-          TabOrder = 14
+          TabOrder = 10
           WordWrap = False
           OnChange = DBMemoWebPageChange
         end
@@ -396,7 +364,7 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 201
         Width = 1280
-        Height = 334
+        Height = 320
         Align = alClient
         DataSource = DSBuy
         Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
@@ -475,6 +443,15 @@ object FrmMain: TFrmMain
           TabOrder = 1
           OnClick = ChBoxImagesViewerClick
         end
+        object CheckBoxAutosize: TCheckBox
+          Left = 432
+          Top = 10
+          Width = 158
+          Height = 17
+          Caption = #1040#1074#1090#1086#1074#1099#1088#1072#1074#1085#1080#1074#1072#1085#1080#1077' '#1087#1086#1083#1077#1081
+          TabOrder = 2
+          OnClick = CheckBoxAutosizeClick
+        end
       end
     end
     object TabSheet2: TTabSheet
@@ -484,7 +461,7 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 147
         Width = 1280
-        Height = 388
+        Height = 374
         Align = alClient
         DataSource = DSSell
         TabOrder = 0
@@ -670,7 +647,6 @@ object FrmMain: TFrmMain
         Width = 1280
         Height = 473
         Align = alTop
-        Enabled = False
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -686,12 +662,12 @@ object FrmMain: TFrmMain
   end
   object JvImagesViewer: TJvImagesViewer
     Left = 0
-    Top = 646
+    Top = 632
     Width = 1288
-    Height = 140
+    Height = 154
     HorzScrollBar.Range = 610
     HorzScrollBar.Tracking = True
-    VertScrollBar.Range = 120
+    VertScrollBar.Range = 122
     VertScrollBar.Tracking = True
     VertScrollBar.Visible = False
     Directory = 'C:\Users\USER\Documents\ShoppingBaseSave\Images\0176716'
@@ -709,10 +685,9 @@ object FrmMain: TFrmMain
     Options.Transparent = True
     Options.ScrollBar = tvHorizontal
     Options.ShowCaptions = False
-    Options.VertSpacing = 0
+    Options.VertSpacing = 2
     SelectedIndex = -1
     Align = alBottom
-    Color = clGradientActiveCaption
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -724,9 +699,7 @@ object FrmMain: TFrmMain
     TabOrder = 3
     TabStop = True
     Visible = False
-    ExplicitLeft = 1148
-    ExplicitTop = 83
-    ExplicitWidth = 703
+    OnDblClick = JvImagesViewerDblClick
   end
   object OpenDialog: TOpenDialog
     Left = 576
@@ -1057,6 +1030,7 @@ object FrmMain: TFrmMain
     Top = 491
   end
   object PopMenuDBG: TPopupMenu
+    OnPopup = PopMenuDBGPopup
     Left = 852
     Top = 403
     object PM_OpenWebPage: TMenuItem
@@ -1066,6 +1040,35 @@ object FrmMain: TFrmMain
     object PM_CloneRecord: TMenuItem
       Caption = #1050#1083#1086#1085#1080#1088#1086#1074#1072#1090#1100' '#1079#1072#1087#1080#1089#1100' '#1082#1072#1082' '#1085#1086#1074#1091#1102
       OnClick = PM_CloneRecordClick
+    end
+  end
+  object MainMenu: TMainMenu
+    Left = 852
+    Top = 347
+    object N1: TMenuItem
+      Caption = #1060#1072#1081#1083
+    end
+    object N2: TMenuItem
+      Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080
+      object MM_OpenSettings: TMenuItem
+        Caption = #1055#1088#1072#1084#1077#1090#1088#1099
+        OnClick = MM_OpenSettingsClick
+      end
+    end
+    object N3: TMenuItem
+      Caption = #1055#1086#1084#1086#1097#1100
+      object MM_OpenGitHub: TMenuItem
+        Caption = #1057#1090#1088#1072#1085#1080#1094#1072' '#1087#1088#1086#1077#1082#1090#1072' '#1085#1072' GitHub'
+        OnClick = MM_OpenGitHubClick
+      end
+      object MM_OpenFrmUpdate: TMenuItem
+        Caption = #1055#1088#1086#1074#1077#1088#1080#1090#1100' '#1086#1073#1085#1086#1074#1083#1077#1085#1080#1103
+        OnClick = MM_OpenFrmUpdateClick
+      end
+      object MM_Test: TMenuItem
+        Caption = #1058#1077#1089#1090
+        OnClick = MM_TestClick
+      end
     end
   end
 end

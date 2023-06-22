@@ -16,7 +16,7 @@ uses
   JvDatePickerEdit, JvDBDatePickerEdit, System.ImageList, Vcl.ImgList,
   Vcl.Buttons, JvCombobox, System.DateUtils, System.StrUtils, Vcl.Menus,
   Winapi.ShellAPI, Vcl.CheckLst, JvExCheckLst, JvCheckListBox, JvExForms,
-  JvCustomItemViewer, JvImagesViewer, skia.Vcl;
+  JvCustomItemViewer, JvImagesViewer, skia.Vcl, GetVer, ShlObj, ExplorerShowFiles;
 
 type TSortType = (stASC, stDESC);
 type TTablesName = (tnAll, tnBuyTable, tnSellTable, tnGroupsTable,
@@ -30,12 +30,10 @@ type
     lblEdSearch: TLabeledEdit;
     BtnSearch: TButton;
     BtnSearchClose: TButton;
-    CmBoxVclStyle: TComboBox;
     FDConnection: TFDConnection;
     FDQ: TFDQuery;
     FDQBuy: TFDQuery;
     DSBuy: TDataSource;
-    BtnTest: TButton;
     PageControl: TPageControl;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
@@ -99,7 +97,6 @@ type
     FDTGroups: TFDTable;
     JvChCmBoxViewSelectedGroups: TJvCheckedComboBox;
     LblSelectViewGroups: TLabel;
-    dbeWebPage: TDBEdit;
     lblProductWebPage: TLabel;
     PopMenuDBG: TPopupMenu;
     PM_OpenWebPage: TMenuItem;
@@ -107,13 +104,20 @@ type
     PM_CloneRecord: TMenuItem;
     JvImagesViewer: TJvImagesViewer;
     ChBoxImagesViewer: TCheckBox;
+    CheckBoxAutosize: TCheckBox;
+    MainMenu: TMainMenu;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    MM_OpenGitHub: TMenuItem;
+    MM_OpenSettings: TMenuItem;
+    MM_Test: TMenuItem;
+    MM_OpenFrmUpdate: TMenuItem;
     procedure FormCreate(Sender: TObject);
-    procedure CmBoxVclStyleSelect(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
     procedure BtnSearchCloseClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure BtnTestClick(Sender: TObject);
     procedure SpBtnBuyTabColAutoSizeClick(Sender: TObject);
     procedure SpBtnBuyTabColSaveClick(Sender: TObject);
     procedure FDQBeforeDelete(DataSet: TDataSet);
@@ -128,12 +132,18 @@ type
     procedure DBNavigatorBuyTabClick(Sender: TObject; Button: TNavigateBtn);
     procedure jvdpeGuaranteeLastDateClick(Sender: TObject);
     procedure DBCmBoxGuarantPeriodChange(Sender: TObject);
-    procedure dbeWebPageChange(Sender: TObject);
     procedure PM_OpenWebPageClick(Sender: TObject);
     procedure DBMemoWebPageChange(Sender: TObject);
     procedure PM_CloneRecordClick(Sender: TObject);
     procedure JvDBGBuyCellClick(Column: TColumn);
     procedure ChBoxImagesViewerClick(Sender: TObject);
+    procedure CheckBoxAutosizeClick(Sender: TObject);
+    procedure PopMenuDBGPopup(Sender: TObject);
+    procedure MM_OpenGitHubClick(Sender: TObject);
+    procedure JvImagesViewerDblClick(Sender: TObject);
+    procedure MM_OpenSettingsClick(Sender: TObject);
+    procedure MM_TestClick(Sender: TObject);
+    procedure MM_OpenFrmUpdateClick(Sender: TObject);
   private
     FSTLog: TStrings;
     FFieldLastSorted: string;
@@ -152,13 +162,9 @@ type
     procedure SetGuaranteeLastDate;
     procedure UpdateControlSelectedGroups;
     function GetGroupIDByName(GroupName: String): Integer;
-
-
-
   public
     { Public declarations }
     procedure UpdateMainTable;
-
   end;
 
 var
@@ -169,8 +175,11 @@ var
   DBFile        : String;
   DBSaveDir     : String;
   DBImagesDir   : String;
+  USERPROFILE   : String;
+  CurrentVer    : String;
   FileBuyTabColSettings : String;
   FileSellTabColSettings: String;
+  SystemColorWindow: TColor;
 
   arTabNameStr: array[TTablesName] of string =
     ('AllTab', 'BuyTab', 'SellTab', 'GroupsTab', 'BuySellTab', 'BuyGroupTab');
@@ -268,9 +277,14 @@ var
      taLeftJustify); // 6 Имя покупателя
 
 
+
+const
+  GitHubLink = 'https://github.com/superbot-coder/ShoppingBaseSQLite';
+  MB_CAPTION = 'Shopping History';
+
 implementation
 
-USES UfrmEditGroups, UFrmSelectWebPage;
+USES UfrmEditGroups, UFrmSelectWebPage, UFrmSettings, UFrmImageViewer, UFrmGitUpdate;
 
 {$R *.dfm}
 
@@ -340,34 +354,7 @@ begin
                end;
              end;
            end;
-
            SQL.Add('ORDER BY ' + arBuyTabFieldsName[1] + ' ASC');
-           mm.Lines.Add(SQL.Text);
-
-         { SQL.Text := 'SELECT * FROM ' + arTabNameStr[tnBuyTable] + ' ' +
-           'WHERE (strftime(''%d.%m.%Y'', ' + arBuyTabFieldsName[1] + ') LIKE :p1) ' + // 1 Дата покупки
-                'OR (' + arBuyTabFieldsName[2] + ' LIKE :p2) ' + // 2 Название товара
-                'OR (' + arBuyTabFieldsName[3] + ' LIKE :p3) ' + // 3 Количество
-                'OR (' + arBuyTabFieldsName[4] + ' LIKE :p4) ' + // 4 Цена
-                'OR (' + arBuyTabFieldsName[5] + ' LIKE :p5) ' + // 5 Срок гарантии
-                'OR (strftime(''%d.%m.%Y'', ' + arBuyTabFieldsName[6] + ') LIKE :p6) ' + // 6 Дата истечения гарантии
-                'OR (' + arBuyTabFieldsName[7] + ' LIKE :p7) ' + // 7 Название магазина
-                'OR (' + arBuyTabFieldsName[8] + ' LIKE :p8) ' + // 8 Код товара в магазине
-                'OR (' + arBuyTabFieldsName[9] + ' LIKE :p9) ' + // 9 Телефон продавца
-                'OR (' + arBuyTabFieldsName[10] + ' LIKE :p10) ' + // 10 Имя продавца
-                'ORDER BY ' + arBuyTabFieldsName[1] + ' ASC';
-           // Params.FindParam('p1').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p2').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p3').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p4').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p5').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p6').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p7').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p8').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p9').AsString := '%' + lblEdSearch.Text + '%';
-           //Params.FindParam('p10').AsString := '%' + lblEdSearch.Text +'%';
-           }
-
            Open;
          end;
        end;
@@ -434,43 +421,6 @@ begin
 
 end;
 
-procedure TFrmMain.BtnTestClick(Sender: TObject);
-begin
-
-
-
-  //SetDBEditControls(tnBuyTable);
-  //UpdateControlSelectedGroups;
-  //SetCheckedSelectedGroups(1);
-
- {
-  ADOQuery.SQL.Text := 'SELECT * FROM shopping_data';
-  ADOQuery.Open;
-  ADOQuery.Sort := 'Date_to_buy ASC';
-
-  With ADOQuery do
-  begin
-    First;
-    FDQMain.First;
-    while Not Eof do
-    begin
-      FDQMain.Insert;
-      FDQMain.FieldByName('date_buy').Value        := FieldByName('Date_to_buy').Value;
-      FDQMain.FieldByName('product_name').AsString := FieldByName('Product_name').AsString;
-      FDQMain.FieldByName('count').AsInteger       := ADOQuery.FieldByName('Count').AsInteger;
-      FDQMain.FieldByName('buy_price').AsInteger   := FieldByName('Cost').AsInteger;
-      FDQMain.FieldByName('shop_name').AsString    := FieldByName('Shop_Name').AsString;
-      FDQMain.Post;
-      Next;
-    end;
-  end;
-
-  UpdateMainTable;
-  }
-
-  mm.Lines.AddStrings(FSTLog);
-end;
-
 procedure TFrmMain.ChBoxBuyTabEditModeClick(Sender: TObject);
 begin
   if ChBoxBuyTabEditMode.Checked then
@@ -509,9 +459,15 @@ begin
   end;
 end;
 
-procedure TFrmMain.CmBoxVclStyleSelect(Sender: TObject);
+procedure TFrmMain.CheckBoxAutosizeClick(Sender: TObject);
 begin
-  TStyleManager.SetStyle(CmBoxVclStyle.Text);
+  JvDBGBuy.AutoSizeColumns := CheckBoxAutosize.Checked;
+  {
+  if CheckBoxAutosize.Checked then
+    JvDBGBuy.AutoSizeColumns := true
+  else
+    JvDBGBuy.AutoSizeColumns := False;
+  }
 end;
 
 procedure TFrmMain.CreateTables(TabName: TTablesName);
@@ -594,22 +550,6 @@ begin
   SetGuaranteeLastDate;
 end;
 
-procedure TFrmMain.dbeWebPageChange(Sender: TObject);
-var s: string;
-begin
-   s := LowerCase(dbeWebPage.Text);
-   if LeftStr(s, 8) = 'https://' then
-   begin
-     Delete(s, 1, 8);
-     dbeWebPage.Text := s;
-   end;
-   if LeftStr(s, 7) = 'http://' then
-   begin
-     Delete(s, 1, 7);
-     dbeWebPage.Text := s;
-   end;
-end;
-
 procedure TFrmMain.DBMemoWebPageChange(Sender: TObject);
 var
   s: string;
@@ -662,7 +602,7 @@ var
   i: SmallInt;
 begin
   FDConnection.Open;
-
+  mm.Lines.Add(' TFrmMain.FormActivate');
   if FDConnection.Connected then
   begin
     for i := 0 to Length(arTabNameStr) -1 do
@@ -672,14 +612,14 @@ begin
         CreateTables(TTablesName(i));
     end;
 
-    FDTGroups.TableName := arTabNameStr[tnGroupsTable];
-    FDTGroups.Active    := true;
+    //FDTGroups.TableName := arTabNameStr[tnGroupsTable];
+    //if Not FDTGroups.Active then FDTGroups.Open;
 
     UpdateMainTable;
     UpdateControlSelectedGroups;
     SetFieldsDefault(tnAll);
     SetFeldsSearch(tnBuyTable);
-    FDTGroups.Open;
+
 
     if FileExists(FileBuyTabColSettings) then
       JvDBGBuy.Columns.LoadFromFile(FileBuyTabColSettings);
@@ -695,15 +635,16 @@ procedure TFrmMain.FormCreate(Sender: TObject);
 var
   StyleName: string;
 begin
-  CurrDir := ExtractFileDir(Application.ExeName);
-  for StyleName in TStyleManager.StyleNames do CmBoxVclStyle.Items.Add(StyleName);
+  CurrentVer  := GetVertionInfo(Application.ExeName, true);
+  CurrDir     := ExtractFileDir(Application.ExeName);
+  USERPROFILE := GetEnvironmentVariable('USERPROFILE');
 
   //CmBoxVclStyle.ItemIndex := CmBoxVclStyle.Items.IndexOf('Sapphire Kamri');
   //if CmBoxVclStyle.Text <> '' then TStyleManager.SetStyle(CmBoxVclStyle.Text);
 
   FSTLog := TStringList.Create;
 
-  DBSaveDir   := GetEnvironmentVariable('USERPROFILE') + '\Documents\ShoppingBaseSave';
+  DBSaveDir   := USERPROFILE + '\Documents\ShoppingBaseSave';
   DBImagesDir := DBSaveDir + '\Images';
   DBFile      := DBSaveDir + '\ShoppingBase.db3';
   FileBuyTabColSettings  := DBSaveDir + '\BuyTabColumnsSettings.data';
@@ -712,7 +653,8 @@ begin
   if Not DirectoryExists(DBSaveDir) then ForceDirectories(DBSaveDir);
 
   FDConnection.Params.Database := DBFile;
-
+  SystemColorWindow            := StyleServices.GetSystemColor(clWindow);
+  JvImagesViewer.Color         := SystemColorWindow;
   //JvDBG.Align := alTop;
 
   PanelEditBuy.Align := alTop;
@@ -753,6 +695,18 @@ end;
 procedure TFrmMain.jvdpeGuaranteeLastDateClick(Sender: TObject);
 begin
   SetGuaranteeLastDate;
+end;
+
+procedure TFrmMain.JvImagesViewerDblClick(Sender: TObject);
+begin
+  FrmImageViewer.ShowModal;
+  {
+
+  if JvImagesViewer.Count = 0 then Exit;
+  ShellExecute(Handle, PChar('open'),
+        PChar(JvImagesViewer.Items[JvImagesViewer.SelectedIndex].FileName),
+        Nil, Nil, SW_NORMAL);
+       }
 end;
 
 procedure TFrmMain.LoadColumnsSettings;
@@ -823,6 +777,43 @@ begin
   FSTLog.Add(StrValue);
 end;
 
+procedure TFrmMain.MM_OpenFrmUpdateClick(Sender: TObject);
+begin
+  FrmGitUpdate.ShowModalInit;
+end;
+
+procedure TFrmMain.MM_OpenGitHubClick(Sender: TObject);
+begin
+  ShellExecute(Handle, PChar('open'), PChar(GitHubLink), Nil, Nil, SW_NORMAL);
+end;
+
+procedure TFrmMain.MM_OpenSettingsClick(Sender: TObject);
+begin
+  if ChBoxBuyTabEditMode.Checked then
+  begin
+    MessageBox(Handle, PChar('Что бы войти в настройки завершите редактирование и закройте режим ввода'),
+               PChar(MB_CAPTION), MB_ICONINFORMATION);
+    exit;
+  end;
+  FrmSettings.ShowModal;
+end;
+
+procedure TFrmMain.MM_TestClick(Sender: TObject);
+var
+   s: string;
+   STFiles: TStrings;
+   FileName : string;
+   NewFileName: string;
+   cnt: word;
+begin
+  mm.Lines.AddStrings(FSTLog);
+
+  FileName := 'C:\Users\USER\Downloads\DownloadFile.zip';
+  // FileName := FileNameIncrement(FileName);
+
+  mm.Lines.Add('FileName = ' + FileName);
+end;
+
 procedure TFrmMain.PageControlChange(Sender: TObject);
 begin
   case PageControl.ActivePageIndex of
@@ -833,11 +824,6 @@ end;
 
 procedure TFrmMain.PM_CloneRecordClick(Sender: TObject);
 Var
-  s_prod_name  : string;
-  s_buy_price     : string;
-  s_guarant_period: string;
-  s_shop_name     : string;
-  s_product_id    : string;
   i: SmallInt;
   arFildsSave: array[0..High(arBuyTabFieldsName)] of string;
   msk: string;
@@ -863,14 +849,14 @@ begin
 
   for i := 0 to High(arBuyTabFieldsName) do
   begin
-    mm.Lines.Add('msk = ' + msk[i+1] + ' ' + FDQBuy.Fields[i].AsString);
+    //mm.Lines.Add('msk = ' + msk[i+1] + ' ' + FDQBuy.Fields[i].AsString);
     if msk[i+1] = '1' then arFildsSave[i] := FDQBuy.Fields[i].AsString;
   end;
 
   FDQBuy.Insert;
   for i := 0 to High(arBuyTabFieldsName) do
   begin
-    mm.Lines.Add('msk = ' + msk[i+1] + ' ' + FDQBuy.Fields[i].AsString);
+    //mm.Lines.Add('msk = ' + msk[i+1] + ' ' + FDQBuy.Fields[i].AsString);
     if msk[i+1] = '1' then FDQBuy.Fields[i].AsString := arFildsSave[i];
   end;
 
@@ -907,6 +893,11 @@ begin
     if LeftStr(LowerCase(link), 4) <> 'www.' then link := 'www.' + link;
     ShellExecute(Handle, PChar('open'), PChar(link), Nil, Nil, SW_NORMAL);
   end;
+end;
+
+procedure TFrmMain.PopMenuDBGPopup(Sender: TObject);
+begin
+  PM_CloneRecord.Visible := ChBoxBuyTabEditMode.Checked;
 end;
 
 procedure TFrmMain.SaveColumnsSettings;
