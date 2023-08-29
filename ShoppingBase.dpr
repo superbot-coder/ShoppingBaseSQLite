@@ -9,7 +9,8 @@ uses
   UFrmSelectWebPage in 'UFrmSelectWebPage.pas' {FrmSelectWebPage},
   UFrmSettings in 'UFrmSettings.pas' {FrmSettings},
   UFrmImageViewer in 'UFrmImageViewer.pas' {FrmImageViewer},
-  UFrmGitUpdate in 'UFrmGitUpdate.pas';
+  UFrmGitUpdate in 'UFrmGitUpdate.pas',
+  DBTypes in 'DBTypes.pas';
 
 {$R *.res}
 

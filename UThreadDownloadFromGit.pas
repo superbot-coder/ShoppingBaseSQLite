@@ -8,11 +8,11 @@ uses
 
 type
   TRestFilesRec = Record
-  FileLinkURL  : String;
-  ContentType  : String;
-  FileName     : String;
-  FileSave     : String;
-  RESTStatCode : Integer;
+  FileLinkURL  : String;  //
+  ContentType  : String;  //
+  FileName     : String;  //
+  FileSave     : String;  //
+  RESTStatCode : Integer; //
 End;
   PRestFilesRec = ^TRestFilesRec;
 
@@ -66,7 +66,12 @@ begin
 
   RESTClient.BaseURL       := FPRestFiles^.FileLinkURL;
   RESTClient.Accept        := FPRestFiles^.ContentType;
-  RESTRequest.Execute;
+  try
+    RESTRequest.Execute;
+  except
+    //
+  end;
+
   FStusCode := RESTResponse.StatusCode;
   if FStusCode = 200 then
   begin

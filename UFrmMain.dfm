@@ -44,14 +44,14 @@ object FrmMain: TFrmMain
     BevelOuter = bvNone
     TabOrder = 1
     object lblSelectFieldsSearch: TLabel
-      Left = 488
+      Left = 496
       Top = 24
       Width = 176
       Height = 13
       Caption = #1042#1099#1073#1086#1088' '#1087#1086#1083#1077#1081' '#1090#1072#1073#1083#1080#1094#1099' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072':'
     end
     object LblSelectViewGroups: TLabel
-      Left = 829
+      Left = 843
       Top = 24
       Width = 68
       Height = 13
@@ -85,8 +85,8 @@ object FrmMain: TFrmMain
       TabOrder = 2
       OnClick = BtnSearchCloseClick
     end
-    object JvChCmBoxFieldsSearch: TJvCheckedComboBox
-      Left = 488
+    object JvChCmBoxFieldsSearchBuy: TJvCheckedComboBox
+      Left = 496
       Top = 40
       Width = 325
       Height = 21
@@ -96,14 +96,28 @@ object FrmMain: TFrmMain
       TabOrder = 3
     end
     object JvChCmBoxViewSelectedGroups: TJvCheckedComboBox
-      Left = 827
+      Left = 843
       Top = 40
-      Width = 252
+      Width = 303
       Height = 21
       CapSelectAll = '&Select all'
       CapDeSelectAll = '&Deselect all'
       CapInvertAll = '&Invert all'
+      DropDownLines = 15
       TabOrder = 4
+      OnChange = JvChCmBoxViewSelectedGroupsChange
+    end
+    object JvChCmBoxFieldsSearchSell: TJvCheckedComboBox
+      Left = 496
+      Top = 40
+      Width = 325
+      Height = 21
+      CapSelectAll = '&Select all'
+      CapDeSelectAll = '&Deselect all'
+      CapInvertAll = '&Invert all'
+      DropDownLines = 15
+      TabOrder = 5
+      Visible = False
     end
   end
   object PageControl: TPageControl
@@ -121,14 +135,14 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 33
         Width = 1280
-        Height = 168
+        Height = 200
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
         Visible = False
         DesignSize = (
           1280
-          168)
+          200)
         object Label1: TLabel
           Left = 16
           Top = 17
@@ -200,15 +214,15 @@ object FrmMain: TFrmMain
           Caption = #1050#1086#1076' '#1090#1086#1074#1072#1088#1072':'
         end
         object LblSelectGroups: TLabel
-          Left = 763
-          Top = 67
+          Left = 771
+          Top = 115
           Width = 76
           Height = 13
           Caption = #1042#1099#1073#1086#1088' '#1075#1088#1091#1087#1087#1099':'
         end
         object SpBtnEditGroups: TSpeedButton
-          Left = 1113
-          Top = 85
+          Left = 1121
+          Top = 133
           Width = 23
           Height = 22
           OnClick = SpBtnEditGroupsClick
@@ -219,6 +233,13 @@ object FrmMain: TFrmMain
           Width = 111
           Height = 13
           Caption = #1042#1077#1073' '#1089#1090#1088#1072#1085#1080#1094#1072' '#1090#1086#1074#1072#1088#1072':'
+        end
+        object LlbStatItem: TLabel
+          Left = 771
+          Top = 69
+          Width = 88
+          Height = 13
+          Caption = #1057#1086#1089#1090#1086#1103#1085#1080#1077' '#1074#1077#1097#1080':'
         end
         object dbeProductName: TDBEdit
           Left = 120
@@ -260,7 +281,7 @@ object FrmMain: TFrmMain
         end
         object DBNavigatorBuyTab: TDBNavigator
           Left = 14
-          Top = 136
+          Top = 168
           Width = 440
           Height = 25
           DataSource = DSBuy
@@ -329,8 +350,8 @@ object FrmMain: TFrmMain
           OnChange = DBCmBoxGuarantPeriodChange
         end
         object JvChCmBoxSelectGroups: TJvCheckedComboBox
-          Left = 763
-          Top = 86
+          Left = 771
+          Top = 134
           Width = 344
           Height = 21
           CapSelectAll = '&Select all'
@@ -339,8 +360,8 @@ object FrmMain: TFrmMain
           TabOrder = 11
         end
         object BtnSetGroup: TButton
-          Left = 1142
-          Top = 83
+          Left = 1150
+          Top = 131
           Width = 109
           Height = 25
           Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1075#1088#1091#1087#1087#1099
@@ -351,7 +372,7 @@ object FrmMain: TFrmMain
           Left = 12
           Top = 86
           Width = 745
-          Height = 35
+          Height = 67
           DataField = 'web_page'
           DataSource = DSBuy
           ScrollBars = ssVertical
@@ -359,12 +380,27 @@ object FrmMain: TFrmMain
           WordWrap = False
           OnChange = DBMemoWebPageChange
         end
+        object DBCmBoxItemState: TDBComboBox
+          Left = 771
+          Top = 88
+          Width = 344
+          Height = 21
+          DataField = 'item_state'
+          DataSource = DSBuy
+          Items.Strings = (
+            #1042' '#1085#1072#1083#1080#1095#1080#1080' ('#1080#1089#1087#1088#1072#1074#1085#1086')'
+            #1042#1086#1079#1074#1088#1072#1097#1077#1085#1086' '#1087#1086' '#1075#1072#1088#1072#1085#1090#1080#1080
+            #1042#1099#1096#1083#1086' '#1080#1079' '#1089#1090#1088#1086#1103' ('#1089#1083#1086#1084#1072#1085#1086')'
+            #1055#1088#1086#1076#1072#1085#1086
+            #1041#1077#1079#1074#1086#1079#1074#1088#1072#1090#1085#1086' '#1091#1090#1077#1088#1103#1085#1086)
+          TabOrder = 14
+        end
       end
       object JvDBGBuy: TJvDBGrid
         Left = 0
-        Top = 201
+        Top = 233
         Width = 1280
-        Height = 320
+        Height = 288
         Align = alClient
         DataSource = DSBuy
         Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
@@ -400,7 +436,7 @@ object FrmMain: TFrmMain
           1280
           33)
         object SpBtnBuyTabColAutoSize: TSpeedButton
-          Left = 1215
+          Left = 1142
           Top = 5
           Width = 23
           Height = 22
@@ -413,7 +449,7 @@ object FrmMain: TFrmMain
           OnClick = SpBtnBuyTabColAutoSizeClick
         end
         object SpBtnBuyTabColSave: TSpeedButton
-          Left = 1245
+          Left = 1171
           Top = 5
           Width = 23
           Height = 22
@@ -451,6 +487,31 @@ object FrmMain: TFrmMain
           Caption = #1040#1074#1090#1086#1074#1099#1088#1072#1074#1085#1080#1074#1072#1085#1080#1077' '#1087#1086#1083#1077#1081
           TabOrder = 2
           OnClick = CheckBoxAutosizeClick
+        end
+        object BtnBuyTabLoadCol: TButton
+          Left = 1200
+          Top = 5
+          Width = 22
+          Height = 22
+          Hint = #1047#1072#1075#1088#1091#1079#1080#1090#1100' '#1089#1086#1093#1088#1072#1085#1077#1085#1099#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080' '#1082#1086#1083#1086#1085#1086#1082
+          Anchors = [akTop, akRight]
+          ImageIndex = 2
+          Images = ImageList16
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
+        end
+        object BtnBuyTabDropAllColSettings: TButton
+          Left = 1228
+          Top = 5
+          Width = 22
+          Height = 22
+          Hint = #1057#1073#1088#1086#1089#1080#1090#1100' '#1074#1089#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080' '#1082#1086#1083#1086#1085#1086#1082' '#1074#1086#1089#1089#1090#1072#1085#1086#1074#1080#1090#1100' '#1087#1086' '#1091#1084#1086#1083#1095#1072#1085#1080#1102
+          Anchors = [akTop, akRight]
+          Caption = 'x'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 4
         end
       end
     end
@@ -645,8 +706,8 @@ object FrmMain: TFrmMain
         Left = 0
         Top = 0
         Width = 1280
-        Height = 473
-        Align = alTop
+        Height = 521
+        Align = alClient
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -657,6 +718,7 @@ object FrmMain: TFrmMain
         ParentFont = False
         ScrollBars = ssVertical
         TabOrder = 0
+        ExplicitHeight = 518
       end
     end
   end
@@ -670,11 +732,11 @@ object FrmMain: TFrmMain
     VertScrollBar.Range = 122
     VertScrollBar.Tracking = True
     VertScrollBar.Visible = False
-    Directory = 'C:\Users\USER\Documents\ShoppingBaseSave\Images\0176716'
     FileMask = 
       '*.wbmp;*.webp;*.svg;*.gif;*.cur;*.pcx;*.ani;*.png;*.gif;*.jpg;*.' +
       'jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff,*.webp'
     Options.AutoCenter = True
+    Options.Alignment = taLeftJustify
     Options.BrushPattern.EvenColor = clBtnFace
     Options.FrameColor = clNone
     Options.HorzSpacing = 2
@@ -1034,7 +1096,7 @@ object FrmMain: TFrmMain
     Left = 852
     Top = 403
     object PM_OpenWebPage: TMenuItem
-      Caption = #1054#1090#1082#1088#1099#1090#1100' '#1074#1077#1073' '#1090#1088#1072#1085#1080#1094#1091
+      Caption = #1054#1090#1082#1088#1099#1090#1100' '#1074#1077#1073' '#1089#1090#1088#1072#1085#1080#1094#1091
       OnClick = PM_OpenWebPageClick
     end
     object PM_CloneRecord: TMenuItem
@@ -1047,6 +1109,10 @@ object FrmMain: TFrmMain
     Top = 347
     object N1: TMenuItem
       Caption = #1060#1072#1081#1083
+      object MM_Exit: TMenuItem
+        Caption = #1042#1099#1093#1086#1076
+        OnClick = MM_ExitClick
+      end
     end
     object N2: TMenuItem
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080
@@ -1067,8 +1133,16 @@ object FrmMain: TFrmMain
       end
       object MM_Test: TMenuItem
         Caption = #1058#1077#1089#1090
+        Visible = False
         OnClick = MM_TestClick
       end
     end
+  end
+  object JvDragDrop: TJvDragDrop
+    AllowDropElevation = True
+    DropTarget = JvImagesViewer
+    OnDrop = JvDragDropDrop
+    Left = 932
+    Top = 403
   end
 end
