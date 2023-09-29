@@ -44,7 +44,7 @@ end;
 
 procedure TFrmEditGroups.FormCreate(Sender: TObject);
 begin
-  FDTGroups.TableName  := arTabNameStr[tnGroupsTable];
+  FDTGroups.TableName  := Tables.Items[tGroupsTab];
 end;
 
 end.

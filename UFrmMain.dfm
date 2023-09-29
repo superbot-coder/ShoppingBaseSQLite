@@ -413,9 +413,13 @@ object FrmMain: TFrmMain
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
         OnCellClick = JvDBGBuyCellClick
+        SortMarker = smUp
         MultiSelect = True
+        TitleButtons = True
+        TitleButtonAllowMove = True
         BevelInner = bvNone
         BevelOuter = bvNone
+        OnTitleBtnClick = JvDBGBuyTitleBtnClick
         TitleArrow = True
         SelectColumnsDialogStrings.Caption = 'Select columns'
         SelectColumnsDialogStrings.OK = '&OK'
@@ -718,7 +722,6 @@ object FrmMain: TFrmMain
         ParentFont = False
         ScrollBars = ssVertical
         TabOrder = 0
-        ExplicitHeight = 518
       end
     end
   end
@@ -757,6 +760,7 @@ object FrmMain: TFrmMain
     Font.Style = []
     ParentFont = False
     ParentShowHint = False
+    PopupMenu = PMenuImagView
     ShowHint = False
     TabOrder = 3
     TabStop = True
@@ -788,6 +792,9 @@ object FrmMain: TFrmMain
   object FDQBuy: TFDQuery
     BeforeDelete = FDQBeforeDelete
     AfterScroll = FDQBuyAfterScroll
+    Indexes = <
+      item
+      end>
     Connection = FDConnection
     Left = 416
     Top = 432
@@ -1133,7 +1140,6 @@ object FrmMain: TFrmMain
       end
       object MM_Test: TMenuItem
         Caption = #1058#1077#1089#1090
-        Visible = False
         OnClick = MM_TestClick
       end
     end
@@ -1144,5 +1150,26 @@ object FrmMain: TFrmMain
     OnDrop = JvDragDropDrop
     Left = 932
     Top = 403
+  end
+  object PMenuImagView: TPopupMenu
+    OnPopup = PMenuImagViewPopup
+    Left = 280
+    Top = 656
+    object pmivOpenDirImages: TMenuItem
+      Caption = #1054#1090#1082#1088#1099#1090#1100' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1102' '#1089' '#1082#1072#1088#1090#1080#1085#1082#1072#1084#1080
+      OnClick = pmivOpenDirImagesClick
+    end
+    object pmivOpenDirSelectImage: TMenuItem
+      Caption = #1054#1082#1088#1099#1090#1100' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1102' '#1074#1099#1076#1077#1083#1080#1090#1100' '#1092#1072#1081#1083' '#1082#1072#1088#1090#1080#1085#1082#1080
+      OnClick = pmivOpenDirSelectImageClick
+    end
+    object pmivDeleteImage: TMenuItem
+      Caption = #1059#1076#1072#1083#1080#1090#1100' '#1074#1099#1076#1077#1083#1077#1085#1085#1091#1102' '#1082#1072#1088#1090#1080#1085#1082#1091
+      OnClick = pmivDeleteImageClick
+    end
+    object pmivDeleteAllImages: TMenuItem
+      Caption = #1059#1076#1072#1083#1080#1090#1100' '#1074#1089#1077' '#1082#1072#1088#1090#1080#1085#1082#1080' '#1074' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1080
+      OnClick = pmivDeleteAllImagesClick
+    end
   end
 end

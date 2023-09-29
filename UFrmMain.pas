@@ -117,6 +117,11 @@ type
     LlbStatItem: TLabel;
     JvChCmBoxFieldsSearchSell: TJvCheckedComboBox;
     MM_Exit: TMenuItem;
+    PMenuImagView: TPopupMenu;
+    pmivOpenDirImages: TMenuItem;
+    pmivOpenDirSelectImage: TMenuItem;
+    pmivDeleteImage: TMenuItem;
+    pmivDeleteAllImages: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
     procedure BtnSearchCloseClick(Sender: TObject);
@@ -151,22 +156,32 @@ type
     procedure JvDragDropDrop(Sender: TObject; Pos: TPoint; Value: TStrings);
     procedure JvChCmBoxViewSelectedGroupsChange(Sender: TObject);
     procedure MM_ExitClick(Sender: TObject);
+    procedure JvDBGBuyTitleBtnClick(Sender: TObject; ACol: Integer;
+      Field: TField);
+    procedure pmivOpenDirImagesClick(Sender: TObject);
+    procedure pmivOpenDirSelectImageClick(Sender: TObject);
+    procedure PMenuImagViewPopup(Sender: TObject);
+    procedure pmivDeleteImageClick(Sender: TObject);
+    procedure pmivDeleteAllImagesClick(Sender: TObject);
   private
+    FDirImages: String;
     FSTLog: TStrings;
     FFieldLastSorted: string;
     FSortingDirection: TSortType;
+    function GetDirImages: String;
     procedure UpdateStatusBar;
     Procedure AddShops;
     procedure CreateTables(TabName: TTablesName);
     procedure log(StrValue: String);
     function TableExistes(TableName: String): boolean;
     procedure Search;
+    procedure SetCheckedSelectedGroups(BuyId: Integer);
+    procedure SetControlSelectedGroups;
+    procedure SetDBEditControls(TabName: TTablesName);
     procedure SetFieldsDefault(TabName: TTablesName);
     procedure SetFieldsSearch(TabName: TTablesName);
-    procedure SetDBEditControls(TabName: TTablesName);
-    procedure SetCheckedSelectedGroups(BuyId: Integer);
     procedure SetGuaranteeLastDate;
-    procedure SetControlSelectedGroups;
+      procedure SetSortIndexes;
     function GetGroupIDByName(GroupName: String): Integer;
     function GenerateNewImageDir(index: integer): string;
     function GetImageDir(ID: integer): String;
@@ -174,9 +189,9 @@ type
     procedure MoveImagesToNewDir;
     procedure BuyFieldsListCreate;
     procedure FieldsSearchListCreate;
-    function CheckFlag(FPD_FLAGS, Flag: Word): Boolean;
   public
     { Public declarations }
+    property DirImages: String read GetDirImages;
     procedure UpdateMainTable;
   end;
 
@@ -193,9 +208,14 @@ var
   FileBuyTabColSettings : String;
   FileSellTabColSettings: String;
   SystemColorWindow : TColor;
-  BuyFields         : TDictionary<String, TFieldRec>;
+  BuyFields         : TDictionary<TBuyFieldsType, TFieldRec>;
+  SellFields        : TDictionary<TSellFieldsType, TFieldRec>;
   BuyFieldsSearch   : TDictionary<String, String>;
   GroupsSearch      : TDictionary<string, TGroupRec>;
+  Tables            : TDictionary<TTablesName, string>;
+
+  BuyFieldsList     : String;
+  SellFieldsList    : String;
 
 const
   GitHubLink = 'https://github.com/superbot-coder/ShoppingBaseSQLite';
@@ -210,7 +230,7 @@ USES UfrmEditGroups, UFrmSelectWebPage, UFrmSettings, UFrmImageViewer,
 
 procedure TFrmMain.AddShops;
 begin
-  FDQ.SQL.Text := 'SELECT DISTINCT shop_name FROM BuyTab';
+  FDQ.SQL.Text := 'SELECT DISTINCT ' + BuyFieldsName.shop_name + ' FROM BuyTab';
   FDQ.Open;
   FDQ.First;
   DBCmBoxSelectShop.Items.Clear;
@@ -250,7 +270,7 @@ begin
 
     with FDQ do
     begin
-      SQL.Text := 'SELECT * FROM ' + arTabNameStr[tnBuyGroupTable] +
+      SQL.Text := 'SELECT * FROM ' + Tables.Items[tBuyGroupTab] +
                       ' WHERE (buy_id = :p1) and (group_id = :p2)';
       Params.ParamByName('p1').AsInteger := buy_id;
       Params.ParamByName('p2').AsInteger := grp_id;
@@ -260,7 +280,7 @@ begin
       begin
         if IsEmpty then
         begin
-          SQL.Text := 'INSERT INTO ' + arTabNameStr[tnBuyGroupTable] +
+          SQL.Text := 'INSERT INTO ' + Tables.Items[tBuyGroupTab] +
                       ' (buy_id, group_id) VALUES (:p1, :p2)';
           Params[0].AsInteger := buy_id;
           Params[1].AsInteger := grp_id;
@@ -271,7 +291,7 @@ begin
       begin
         if Not IsEmpty then
         begin
-          SQL.Text := 'DELETE FROM ' + arTabNameStr[tnBuyGroupTable] +
+          SQL.Text := 'DELETE FROM ' + Tables.Items[tBuyGroupTab] +
                       ' WHERE buy_id = :p1 AND group_id = :p2';
           Params[0].AsInteger := buy_id;
           Params[1].AsInteger := grp_id;
@@ -288,110 +308,130 @@ procedure TFrmMain.BuyFieldsListCreate;
 var
   FR: TFieldRec;
 begin
+  var BF := BuyFieldsName;
 
-  // 0 id
-  FR.Caption      := 'ID';
-  FR.DefWidth     := 50;
-  FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE;
-  BuyFields.Add('id', FR);
+  // 0 i d
+  FR.Name          := BF.id;
+  FR.Caption       := 'ID';
+  FR.DefWidth      := 50;
+  FR.DefAlignment  := taCenter;
+  FR.Preset        := [fpCreate];
+  BuyFields.Add(bf_id, FR);
 
   // 1 date_buy
+  FR.Name         := BF.date_buy; // 'date_buy';
   FR.Caption      := 'Дата покупки';
   FR.DefWidth     := 100;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('date_buy', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_date_buy, FR);
 
   // 2 product_name
+  FR.Name         := BF.product_name; // 'product_name';
   FR.Caption      := 'Название товара';
   FR.DefWidth     := 300;
   FR.DefAlignment := taLeftJustify;
-  FR.FPD_FLAGS    := FPD_PRESET_ALL;
-  BuyFields.Add('product_name', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpChecket, fpClone];
+  BuyFields.Add(bf_product_name, FR);
 
   // 3 count
+  FR.Name         := BF.count; // 'count';
   FR.Caption      := 'Количество';
   FR.DefWidth     := 50;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('count', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch];
+  BuyFields.Add(bf_count, FR);
 
   // 4 buy_price
+  FR.Name         := BF.buy_price; //'buy_price';
   FR.Caption      := 'Цена';
   FR.DefWidth     := 100;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE
-                     or FPD_FIELD_SEARCHE or FPD_FIELD_CLONE;
-  BuyFields.Add('buy_price', FR);
+  FR.Preset        := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_buy_price, FR);
 
   // 5 guarant_period
+  FR.Name         := BF.guarant_period; //'guarant_period';
   FR.Caption      := 'Срок гарантии';
   FR.DefWidth     := 50;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE
-                     or FPD_FIELD_SEARCHE or FPD_FIELD_CLONE;
-  BuyFields.Add('guarant_period', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_guarant_period, FR);
 
   // 6 guarant_last_date
+  FR.Name         := BF.guarant_last_date; // 'guarant_last_date';
   FR.Caption      := 'Дата истечения гарантии';
   FR.DefWidth     := 100;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE
-                     or FPD_FIELD_SEARCHE or FPD_FIELD_CLONE;
-  BuyFields.Add('guarant_last_date', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_guarant_last_date, FR);
 
   // 7 shop_name
+  FR.Name         := BF.shop_name; // 'shop_name';
   FR.Caption      := 'Магазин';
   FR.DefWidth     := 100;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE
-                     or FPD_FIELD_SEARCHE or FPD_FIELD_CLONE;
-  BuyFields.Add('shop_name', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_shop_name, FR);
 
   // 8 Код товара в магазине
+  FR.Name         := BF.product_id; // 'product_id';
   FR.Caption      := 'Код товара в магазине';
   FR.DefWidth     := 50;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE
-                     or FPD_FIELD_SEARCHE or FPD_FIELD_CLONE;
-  BuyFields.Add('product_id', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_product_id, FR);
 
   // 9 Телефон продавца
+  FR.Name         := BF.seller_phone; //'seller_phone';
   FR.Caption      := 'Телефон продавца';
   FR.DefWidth     := 150;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('seller_phone', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_seller_phone, FR);
 
   // 10 Имя продавца
+  FR.Name         := BF.seller_name;  //'seller_name';
   FR.Caption      := 'Имя продавца';
   FR.DefWidth     := 150;
   FR.DefAlignment := taLeftJustify;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('seller_name', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_seller_name, FR);
 
   // 11 Веб страница
+  FR.Name         := BF.web_page; //'web_page';
   FR.Caption      := 'Веб страница';
   FR.DefWidth     := 150;
   FR.DefAlignment := taLeftJustify;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('web_page', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_web_page, FR);
 
   // 12  ID картинок
   // Это поле отображается только для тестирования на период разработки
+  FR.Name         := BF.image_id; //'image_id';
   FR.Caption      := 'ID картинок';
   FR.DefWidth     := 50;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_CLONE;
-  BuyFields.Add('image_id', FR);
+  FR.Preset       := [fpCreate, fpClone];
+  BuyFields.Add(bf_image_id, FR);
 
   // 13 Состояние
+  FR.Name         := BF.item_state; // 'item_state';
   FR.Caption      := 'Состояние';
   FR.DefWidth     := 150;
   FR.DefAlignment := taCenter;
-  FR.FPD_FLAGS    := FPD_FIELD_CREATE or FPD_FIELD_VISIBLE or FPD_FIELD_SEARCHE;
-  BuyFields.Add('item_state', FR);
+  FR.Preset       := [fpCreate, fpVisible, fpSearch, fpClone];
+  BuyFields.Add(bf_item_state, FR);
+
+  for var i: byte := 0 to ord(High(TBuyFieldsType)) do
+  begin
+    BuyFieldsList := BuyFieldsList + '   ' + Tables.Items[tBuyTab] + '.' +
+    BuyFields.items[TBuyFieldsType(i)].Name +',' + #13#10
+  end;
+  BuyFieldsList := BuyFieldsList + '   ' + Tables.Items[tImagesTab] + '.' + ImagesFieldsName.directory + #13#10;
+
+  // mm.Lines.Add('BuyFieldsList: ' + BuyFieldsList);
+
 end;
 
 procedure TFrmMain.ChBoxBuyTabEditModeClick(Sender: TObject);
@@ -400,7 +440,7 @@ begin
   begin
     DBNavigatorBuyTab.Enabled := true;
     PanelEditBuy.Visible      := true;
-    SetDBEditControls(tnBuyTable);
+    SetDBEditControls(tBuyTab);
     // UpdateControlSelectedGroups;
   end
     else
@@ -443,22 +483,16 @@ begin
   }
 end;
 
-function TFrmMain.CheckFlag(FPD_FLAGS, Flag: Word): Boolean;
-begin
-   if (FPD_FLAGS AND FLag) = Flag then
-     Result := true
-   else
-     Result := false;
-end;
-
 procedure TFrmMain.CreateTables(TabName: TTablesName);
 begin
   with FDQ do
   begin
     // Таблица BuyTable
-    if TabName in [tnAll, tnBuyTable] then
+    if TabName in [tAll, tBuyTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnBuyTable] + ' (' +
+      var BF := BuyFieldsName;
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tBuyTab] + ' (' +
+        {
         arBuyTabFieldsName[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, ' +
         arBuyTabFieldsName[1] + ' DATE NOT NULL, '     + // Дата покупки
         arBuyTabFieldsName[2] + ' VARCHAR NOT NULL,'   + // Название товара
@@ -473,66 +507,82 @@ begin
         arBuyTabFieldsName[11] + ' VARCHAR, '          + // Веб страница
         arBuyTabFieldsName[12] + ' INTEGER, '          + // id директории картинок
         arBuyTabFieldsName[13] + ' VARCHAR)';            // Состояние вещи
+         }
+        BF.id           + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1, ' +
+        BF.date_buy     + ' DATE NOT NULL, '     + // Дата покупки
+        BF.product_name + ' VARCHAR NOT NULL,'   + // Название товара
+        BF.count        + ' INTEGER NOT NULL, '  + // Количество
+        BF.buy_price    + ' CURRENCY NOT NULL, ' + // Цена
+        BF.guarant_period    + ' INTEGER, '           + // Срок гарантии
+        BF.guarant_last_date + ' DATE, '              + // Дата истечения гарантии
+        BF.shop_name    + ' VARCHAR, '           + // Название магазина
+        BF.product_id   + ' VARCHAR, '           + // Код товара в магазине
+        BF.seller_phone + ' VARCHAR, '           + // Телефон продавца
+        BF.seller_name  + ' VARCHAR, '          + // Имя продавца
+        BF.web_page     + ' VARCHAR, '          + // Веб страница
+        BF.image_id     + ' INTEGER, '          + // id директории картинок
+        BF.item_state   + ' VARCHAR)';            // Состояние вещи
+
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnBuyTable]);
+      log('Create Table Name: ' + Tables.Items[tBuyTab]);
     end;
 
     // Таблица SellTable
-    if TabName in [tnAll, tnSellTable] then
+    if TabName in [tAll, tSellTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnSellTable] + ' (' +
-        arSellTabFieldsName[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
-        arSellTabFieldsName[1] + ' DATA, '              + // Дата продажи
-        arSellTabFieldsName[2] + ' VARCHAR,'            + // Название товара
-        arSellTabFieldsName[3] + ' INTEGER, '           + // Количество
-        arSellTabFieldsName[4] + ' CURRENCY NOT NULL, ' + // Цена продажи
-        arSellTabFieldsName[5] + ' VARCHAR, '           + // Телефон покупателя
-        arSellTabFieldsName[6] + ' VARCHAR)';             // Имя покупателя
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tSellTab] + ' (' +
+        arSellFields[0] + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
+        arSellFields[1] + ' DATA, '              + // Дата продажи
+        arSellFields[2] + ' VARCHAR,'            + // Название товара
+        arSellFields[3] + ' INTEGER, '           + // Количество
+        arSellFields[4] + ' CURRENCY NOT NULL, ' + // Цена продажи
+        arSellFields[5] + ' VARCHAR, '           + // Телефон покупателя
+        arSellFields[6] + ' VARCHAR)';             // Имя покупателя
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnSellTable]);
+      log('Create Table Name: ' + Tables.Items[tSellTab]);
     end;
 
     // Таблица GroupsTable
-    if TabName in [tnAll, tnGroupsTable] then
+    if TabName in [tAll, tGroupsTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnGroupsTable] + ' (' +
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tGroupsTab] + ' (' +
                   'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
                   'group_name VARCHAR UNIQUE NOT NULL)'; // Имя группы товара
 
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnGroupsTable]);
+      log('Create Table Name: ' + Tables.Items[tGroupsTab]);
     end;
 
     //Таблица BuySellTable
-    if TabName in [tnAll, tnBuySellTable] then
+    if TabName in [tAll, tBuySellTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnBuySellTable] + ' (' +
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tBuySellTab] + ' (' +
                   'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
                   'buy_id INTEGER NOT NULL, ' + // id записи товара из BuyTab
                   'sell_id INTEGER NOT NULL)';  // id записи товара из SellTab
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnBuySellTable]);
+      log('Create Table Name: ' + Tables.Items[tBuySellTab]);
     end;
 
     //Таблица BuyGroupTab
-    if TabName in [tnAll, tnBuyGroupTable] then
+    if TabName in [tAll, tBuyGroupTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnBuyGroupTable] + ' (' +
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tBuyGroupTab] + ' (' +
                   'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
                   'buy_id INTEGER NOT NULL, ' + // id записи товара из BuyTab
                   'group_id INTEGER NOT NULL)'; // id группы товара из GroupsTab
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnBuyGroupTable]);
+      log('Create Table Name: ' + Tables.Items[tBuyGroupTab]);
     end;
 
     //Таблица ImagesTab
-    if TabName in [tnAll, tnImagesTable] then
+    if TabName in [tAll, tImagesTab] then
     begin
-      SQL.Text := 'CREATE TABLE ' + arTabNameStr[tnImagesTable] + ' (' +
+      SQL.Text := 'CREATE TABLE ' + Tables.Items[tImagesTab] + ' (' +
                   'id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL DEFAULT 1,' +
                   'directory)';  // images dirctoty
       ExecSQL;
-      log('Create Table Name: ' + arTabNameStr[tnImagesTable]);
+      log('Create Table Name: ' + Tables.Items[tImagesTab]);
     end;
 
   end;
@@ -580,7 +630,7 @@ begin
      PChar(''), MB_ICONWARNING or MB_YESNO) = ID_NO then Abort;
 
   // Удаление связи с группами ключа удаляемой записи
-  FDQ.SQL.Text := 'DELETE FROM ' + arTabNameStr[tnBuyGroupTable] + ' ' +
+  FDQ.SQL.Text := 'DELETE FROM ' + Tables.Items[tBuyGroupTab] + ' ' +
                   'WHERE buy_id = ' + DataSet.FieldByName('id').AsString;
   FDQ.ExecSQL;
 end;
@@ -606,23 +656,20 @@ var
   i: SmallInt;
 begin
   FDConnection.Open;
-  mm.Lines.Add(' TFrmMain.FormActivate');
+
   if FDConnection.Connected then
   begin
-    for i := 0 to Length(arTabNameStr) -1 do
-    begin
-      if i = 0 then Continue;
-      if TableExistes(arTabNameStr[TTablesName(i)]) = false then
-        CreateTables(TTablesName(i));
-    end;
+    for var TabName in Tables do
+      if Not TableExistes(TabName.Value) then
+        CreateTables(TabName.Key);
 
     //FDTGroups.TableName := arTabNameStr[tnGroupsTable];
     //if Not FDTGroups.Active then FDTGroups.Open;
 
     UpdateMainTable;
     SetControlSelectedGroups;
-    SetFieldsDefault(tnAll);
-    SetFieldsSearch(tnBuyTable);
+    SetFieldsDefault(tAll);
+    SetFieldsSearch(tBuyTab);
 
     if FileExists(FileBuyTabColSettings) then
       JvDBGBuy.Columns.LoadFromFile(FileBuyTabColSettings);
@@ -662,9 +709,18 @@ begin
 
   PanelEditBuy.Align := alTop;
   PanelSearch.Align  := alTop;
-  BuyFields := TDictionary<String, TFieldRec>.Create;
+
+  Tables := TDictionary<TTablesName,string>.Create;
+  Tables.Add(tBuyTab, 'BuyTab');           // Таблица Купленных товаров
+  Tables.Add(tSellTab, 'SellTable');       // Таблица Проданных товаров
+  Tables.Add(tGroupsTab, 'GroupsTab');     // Таблица с Группами товаров
+  Tables.Add(tBuySellTab, 'BuySellTab');   // Таблица связи покупки и продажи
+  Tables.Add(tBuyGroupTab, 'BuyGroupTab'); // Таблица связи Покупок и Групп
+  Tables.Add(tImagesTab, 'ImagesTab');     // Таблица в директориями картинок
+
+  BuyFields       := TDictionary<TBuyFieldsType, TFieldRec>.Create;
   BuyFieldsSearch := TDictionary<String, String>.Create;
-  GroupsSearch := TDictionary<String, TGroupRec>.Create;
+  GroupsSearch    := TDictionary<String, TGroupRec>.Create;
   BuyFieldsListCreate;
   FieldsSearchListCreate;
 
@@ -678,12 +734,23 @@ begin
   BuyFields.Free;
   BuyFieldsSearch.Free;
   GroupsSearch.Free;
+  Tables.Free;
+end;
+
+function TFrmMain.GetDirImages: String;
+begin
+  if FDQBuy.FieldByName('directory').IsNull or
+    (FDQBuy.FieldByName('directory').AsString = '') then
+    FDirImages := ''
+  else
+    FDirImages := DBImagesDir + '\' + FDQBuy.FieldByName('directory').AsString;
+  Result := FDirImages;
 end;
 
 function TFrmMain.GetGroupIDByName(GroupName: String): Integer;
 begin
   Result := -1;
-  FDQ.SQL.Text := 'SELECT * FROM ' + arTabNameStr[tnGroupsTable] +
+  FDQ.SQL.Text := 'SELECT * FROM ' + Tables.Items[tGroupsTab] +
                   ' WHERE group_name = ''' + GroupName + '''';
   FDQ.Open;
   if FDQ.IsEmpty then Exit;
@@ -692,7 +759,7 @@ end;
 
 function TFrmMain.GetImageDir(ID: integer): String;
 begin
-  FDQ.SQL.Text := 'SELECT directory FROM ' + arTabNameStr[tnImagesTable] +
+  FDQ.SQL.Text := 'SELECT directory FROM ' + Tables.Items[tImagesTab] +
                   ' WHERE ID = ' + ID.ToString;
   FDQ.Open;
   if FDQ.IsEmpty then
@@ -720,33 +787,24 @@ begin
     GR.checket := JvChCmBoxViewSelectedGroups.Checked[i];
     GroupsSearch.AddOrSetValue(JvChCmBoxViewSelectedGroups.Items[i], GR);
   end;
-
-  // JvChCmBoxViewSelectedGroups.Items.Text;
-  //RG := GroupsSearch.Items[]
-  //GroupsSearch.AddOrSetValue()
   UpdateMainTable;
 end;
 
 procedure TFrmMain.JvDBGBuyCellClick(Column: TColumn);
-var
-  DirImages: String;
-  img_id: Integer;
 begin
   if FDQBuy.IsEmpty or (not ChBoxImagesViewer.Checked) then Exit;
-
-  DirImages := FDQBuy.FieldByName('directory').AsString;
-
-  if DirImages = '' then
-  begin
-    DirImages := FDQBuy.FieldByName(arBuyTabFieldsName[8]).AsString;
-    if DirImages = '' then
-       DirImages := 'ID_' + FDQBuy.FieldByName(arBuyTabFieldsName[0]).AsString;
-    DirImages := DBImagesDir + '\' + DirImages;
-  end
-  else
-    DirImages := DBImagesDir + '\' + DirImages;
   JvImagesViewer.Directory := DirImages;
+end;
 
+procedure TFrmMain.JvDBGBuyTitleBtnClick(Sender: TObject; ACol: Integer;
+  Field: TField);
+begin
+  var SortMarker := (Sender as TJvDBGrid).SortMarker;
+  case SortMarker of
+   smNone:  FDQBuy.IndexName := Field.DisplayName + '_index_asc';
+   smDown:  FDQBuy.IndexName := Field.DisplayName + '_index_desc';
+   smUp:    FDQBuy.IndexName := Field.DisplayName + '_index_asc';
+  end;
 end;
 
 procedure TFrmMain.jvdpeGuaranteeLastDateClick(Sender: TObject);
@@ -765,9 +823,11 @@ var
   RN: Integer;
 begin
   if FDQBuy.IsEmpty
-    or (FDQBuy.FieldByName(arBuyTabFieldsName[0]).Value = -1)
+    or (FDQBuy.FieldByName(BuyFieldsName.id).Value = -1)
   then
     Exit;
+
+  var BF := BuyFieldsName;
 
    id_msg_result := MessageBox(Handle,
          PChar('Если необходимо переместить файл(ы) в директорию программы то нажмите: ' + #13#10 +
@@ -778,18 +838,18 @@ begin
 
    if id_msg_result = ID_CANCEL then Exit;
 
-  if FDQBuy.FieldByName(arBuyTabFieldsName[12]).IsNull then
+  if FDQBuy.FieldByName(BF.image_id).IsNull then
   begin
     // Если нет image_id т.е. картинки добавляются в первые
     img_id := NewImageID;
     FDQBuy.Edit;
-    FDQBuy.FieldByName(arBuyTabFieldsName[12]).Value := img_id;
+    FDQBuy.FieldByName(BF.image_id).Value := img_id;
     FDQBuy.Post;
   end
     else
   begin
     // если image_id уже есть
-    img_id := FDQBuy.FieldByName(arBuyTabFieldsName[12]).AsInteger;
+    img_id := FDQBuy.FieldByName(BF.image_id).AsInteger;
   end;
 
   ImageDir := DBImagesDir + PathDelim + GetImageDir(img_id);
@@ -841,14 +901,9 @@ end;
 
 procedure TFrmMain.JvImagesViewerDblClick(Sender: TObject);
 begin
+  if JvImagesViewer.Count = 0 then
+    Exit;
   FrmImageViewer.ShowModal;
-  {
-
-  if JvImagesViewer.Count = 0 then Exit;
-  ShellExecute(Handle, PChar('open'),
-        PChar(JvImagesViewer.Items[JvImagesViewer.SelectedIndex].FileName),
-        Nil, Nil, SW_NORMAL);
-       }
 end;
 
 procedure TFrmMain.log(StrValue: String);
@@ -884,9 +939,30 @@ begin
 end;
 
 procedure TFrmMain.MM_TestClick(Sender: TObject);
+var
+  S: String;
+  Indx: TFDIndex;
 begin
-  // for debug
-  mm.Lines.Add('TFrmMain.MM_TestClick:');
+  //FDQBuy.Filter := 'ORDER BY ' + BuyFieldsName.product_name + ' ASC';
+  //FDQBuy.Filtered := true;
+
+
+  mm.Lines.Add(FDQBuy.Indexes.ToString);
+
+
+  {
+  // сперва добавляем индех
+  with FDQBuy.Indexes.Add do begin
+    Name    := 'By OrderName';
+    Fields  := BuyFieldsName.product_name;
+    Options := [soDescNullLast];
+    Active  := True;
+  end;
+
+  // потом вызываем по имени
+  FDQBuy.IndexName := 'By OrderName';
+  }
+
 end;
 
 procedure TFrmMain.MoveImagesToNewDir;
@@ -988,7 +1064,7 @@ end;
 
 function TFrmMain.NewImageID: Integer;
 begin
-  FDQ.SQL.Text := 'SELECT * FROM ' +  arTabNameStr[tnImagesTable];
+  FDQ.SQL.Text := 'SELECT * FROM ' +  Tables.Items[tImagesTab];
   FDQ.Open;
   FDQ.Insert;
   FDQ.Post;
@@ -1015,13 +1091,78 @@ begin
   end;
 end;
 
+procedure TFrmMain.PMenuImagViewPopup(Sender: TObject);
+begin
+  if JvImagesViewer.SelectedIndex = -1 then
+  begin
+    pmivOpenDirSelectImage.Visible := false;
+    pmivDeleteImage.Visible        := false;
+  end
+  else
+  begin
+    pmivOpenDirSelectImage.Visible := true;
+    pmivDeleteImage.Visible        := true;
+  end;
+  if DirImages = '' then
+  begin
+    pmivOpenDirImages.Visible   := false;
+    pmivDeleteAllImages.Visible := false;
+  end
+  else
+  begin
+    pmivOpenDirImages.Visible   := true;
+    pmivDeleteAllImages.Visible := true;
+  end;
+end;
+
+procedure TFrmMain.pmivDeleteAllImagesClick(Sender: TObject);
+begin
+  if MessageBox(Handle, PChar('Вы действительно желаете удалить все картинки?'),
+       PChar(MB_CAPTION), MB_ICONWARNING or MB_YESNO) = ID_NO
+  then
+    exit;
+  for var i: integer := 0 to JvImagesViewer.Count -1 do
+    TFile.Delete(JvImagesViewer.Items[i].FileName);
+  JvImagesViewer.LoadImages;
+end;
+
+procedure TFrmMain.pmivDeleteImageClick(Sender: TObject);
+begin
+  if MessageBox(
+       Handle,
+       PChar('Вы действительно желаете удалить выделеную картинку?'),
+       PChar(MB_CAPTION), MB_ICONWARNING or MB_YESNO) = ID_NO
+  then
+    exit;
+  TFile.Delete(JvImagesViewer.Items[JvImagesViewer.SelectedIndex].FileName);
+  JvImagesViewer.LoadImages;
+end;
+
+procedure TFrmMain.pmivOpenDirImagesClick(Sender: TObject);
+begin
+  ShellExecute(Handle, PChar('open'),PChar(FDirImages), Nil, Nil, SW_NORMAL);
+end;
+
+procedure TFrmMain.pmivOpenDirSelectImageClick(Sender: TObject);
+begin
+  var ST := TStringList.Create;
+  try
+    ST.Add(ExtractFileName(JvImagesViewer.Items[JvImagesViewer.SelectedIndex].FileName));
+    ShowFilesOnExplorer(DirImages, ST);
+  finally
+    ST.Free;
+  end;
+end;
+
 procedure TFrmMain.PM_CloneRecordClick(Sender: TObject);
 Var
   i: SmallInt;
-  arFildsSave: array[0..High(arBuyTabFieldsName)] of string;
+  arFildsSave: array[0..ord(High(TBuyFieldsType))] of string;
   msk: string;
+  FieldsSave: TDictionary<string, string>;
 begin
   if (FDQBuy.IsEmpty) then Exit;
+{
   (*
   + id,                                   // 0 ID
   | + date_buy                            // 1 Дата покупки
@@ -1055,9 +1196,29 @@ begin
   for i := 0 to High(arBuyTabFieldsName) do
   begin
     //mm.Lines.Add('msk = ' + msk[i+1] + ' ' + FDQBuy.Fields[i].AsString);
-    if msk[i+1] = '1' then FDQBuy.Fields[i].AsString := arFildsSave[i];
+    if msk[i+1] = '1' then FDQBuy.Fields[i].AsString := arFildsSave[i]
   end;
 
+ }
+
+  FieldsSave := TDictionary<string, string>.Create;
+
+  try
+    for var Fieldpair in BuyFields do
+    begin
+      if Not (fpClone in Fieldpair.Value.Preset) then
+        continue;
+      FieldsSave.Add(Fieldpair.Value.Name, FDQBuy.FieldByName(Fieldpair.Value.Name).AsString);
+    end;
+
+    FDQBuy.Insert;
+
+    for var Fieldpair in FieldsSave do
+      FDQBuy.FieldByName(Fieldpair.Key).AsString := Fieldpair.Value;
+
+  finally
+    FieldsSave.Free;
+  end;
 end;
 
 procedure TFrmMain.PM_OpenWebPageClick(Sender: TObject);
@@ -1109,9 +1270,18 @@ var
   SearchStr: string;
   ADD_OR   : String;
   i        : ShortInt;
-  SqlStr   : String;
+  SqlStr, SubStr : String;
   GroupsChecked: Boolean;
+
 begin
+  var BF :=  BuyFieldsName;
+  var BGF :=  BuyGroupFieldsName;
+  var Buy_Image_id      := Tables.Items[tBuyTab] + '.' + BuyFieldsName.image_id;
+  var Image_id          := Tables.Items[tImagesTab] + '.' + ImagesFieldsName.id;
+  var Buy_id            := Tables.Items[tBuyTab] + '.' + BuyFieldsName.id;
+  var BuyGroup_group_id := Tables.Items[tBuyGroupTab] + '.' + BuyGroupFieldsName.group_id;
+  var BuyGroup_buy_id   := Tables.Items[tBuyGroupTab] + '.' + BuyGroupFieldsName.buy_id;
+
   GroupsChecked := false;
   SearchStr := '''%' + lblEdSearch.Text + '%''';
   if JvChCmBoxViewSelectedGroups.CheckedCount > 0 then
@@ -1124,12 +1294,12 @@ begin
            Close;
            ADD_OR := '';
            SQL.Clear;
-           SqlStr := 'SELECT * FROM ' + arTabNameStr[tnBuyTable] +
-                    ' LEFT OUTER JOIN ' + arTabNameStr[tnImagesTable] +
-                    ' ON ' + arTabNameStr[tnBuyTable] + '.image_id = ' +
-                    arTabNameStr[tnImagesTable] + '.id';
-           if GroupsChecked then
-             SqlStr :=  SqlStr + ', ' + arTabNameStr[tnBuyGroupTable];
+           SqlStr := 'SELECT DISTINCT' + #13#10 + BuyFieldsList + 'FROM ' + #13#10 +
+                     '  ' + Tables.Items[tBuyTab] + ' LEFT OUTER JOIN '+ Tables.Items[tBuyGroupTab] +
+                     ' ON ' + BuyGroup_buy_id + ' = ' + Buy_id + #13#10 +
+                     '  LEFT OUTER JOIN ' + Tables.Items[tImagesTab] +
+                     ' ON ' + Buy_Image_id + ' = ' + Image_id;
+
            SQL.Add(SqlStr);
            SqlStr := '';
            SQL.Add('WHERE');
@@ -1140,7 +1310,7 @@ begin
            begin
              for var ItemPair in BuyFieldsSearch do
              begin
-               if (ItemPair.Value = arBuyTabFieldsName[1]) or (ItemPair.Value = arBuyTabFieldsName[6]) then
+               if (ItemPair.Value = BF.date_buy) or (ItemPair.Value = BF.guarant_last_date) then
                  SQL.Add(ADD_OR + 'strftime(''%d.%m.%Y'', ' + ItemPair.Value + ') LIKE ' + SearchStr)
                else
                  SQL.Add(ADD_OR + ItemPair.Value + ' LIKE ' + SearchStr);
@@ -1154,7 +1324,7 @@ begin
                if Not JvChCmBoxFieldsSearchBuy.Checked[i] then
                  Continue;
                var field := BuyFieldsSearch.Items[JvChCmBoxFieldsSearchBuy.Items[i]];
-               if (field = arBuyTabFieldsName[1]) or (field = arBuyTabFieldsName[6]) then
+               if (field = BF.date_buy) or (field = BF.guarant_last_date) then
                  SQL.Add(ADD_OR + 'strftime(''%d.%m.%Y'', ' + field + ') LIKE ' + SearchStr)
                else
                  SQL.Add(ADD_OR + field + ' LIKE ' + SearchStr);
@@ -1166,17 +1336,25 @@ begin
            begin
              SQL.Add(')');
              SQL.Add('AND');
-             SQL.Add('(');
-             SQL.Add('(BuyGrouptab.buy_id = BuyTab.id)');
-             for var ItemPair in GroupsSearch do
-               if ItemPair.Value.checket then
-                 SqlStr := SqlStr + 'AND (BuyGrouptab.group_id = ' +
-                           ItemPair.Value.id.ToString + ') ';
-             SQL.Add(TrimRight(SqlStr)+')');
+
+             SqlStr := '  ' + BuyGroup_group_id + ' IN ()';
+             SubStr := '';
+             var comma := '';
+             for var FieldPair in GroupsSearch do
+             begin
+               if FieldPair.Value.checket then
+               begin
+                 SubStr := SubStr + comma + FieldPair.Value.id.ToString;
+                 comma := ', ';
+               end;
+             end;
+             SqlStr := StringReplace(SqlStr, '()', '(' + SubStr + ')', []);
+             FDQBuy.SQL.Add(SqlStr);
            end;
 
-           SQL.Add('ORDER BY ' + arBuyTabFieldsName[1] + ' ASC');
-           mm.Lines.Add('');         // for debug
+           SQL.Add('ORDER BY ' + Buy_id + ' ASC');
+           mm.Lines.Add('');
+           mm.Lines.Add('procedure TFrmMain.Search: ');         // for debug
            mm.Lines.AddStrings(SQL); // for debug
            Open;
          end;
@@ -1197,8 +1375,10 @@ var
   GroupName: string;
   x: integer;
 begin
-  BuyGrTab := arTabNameStr[tnBuyGroupTable];
-  GroupTab := arTabNameStr[tnGroupsTable];
+  BuyGrTab := Tables.Items[tBuyGroupTab];
+  GroupTab := Tables.Items[tGroupsTab];
+  var BG := BuyGroupFieldsName;
+  var G  := GroupsFildsName;
 
   FDQ.SQL.Text := 'SELECT ' + GroupTab + '.group_name FROM ' + BuyGrTab + ', ' + GroupTab +
                   ' WHERE (buy_id = :p1) AND (group_id = ' + GroupTab + '.id)';
@@ -1225,11 +1405,12 @@ procedure TFrmMain.SetDBEditControls(TabName: TTablesName);
 var
   StrValue: string;
 begin
+  var BF := BuyFieldsName;
   case TabName of
 
-    tnBuyTable:
+    tBuyTab:
       begin
-        FDQ.SQL.Text := 'SELECT DISTINCT ' + arBuyTabFieldsName[7] + ' FROM ' + arTabNameStr[TabName];
+        FDQ.SQL.Text := 'SELECT DISTINCT ' + BF.shop_name + ' FROM ' + Tables.Items[TabName];
         FDQ.Open;
         if Not FDQ.IsEmpty then
         begin
@@ -1237,16 +1418,16 @@ begin
           FDQ.First;
           while Not FDQ.Eof do
           begin
-            StrValue := FDQ.FieldByName(arBuyTabFieldsName[7]).AsString;
+            StrValue := FDQ.FieldByName(BF.shop_name).AsString;
             if StrValue <> '' then DBCmBoxSelectShop.Items.Add(StrValue);
             FDQ.Next;
           end;
         end;
 
         // 5 Срок гарантии
-        FDQ.SQL.Text := 'SELECT DISTINCT ' + arBuyTabFieldsName[5] + ' ' +
-                        'FROM ' + arTabNameStr[TabName] + ' ' +
-                        'ORDER BY ' + arBuyTabFieldsName[5] + ' ASC';
+        FDQ.SQL.Text := 'SELECT DISTINCT ' + BF.guarant_period + ' ' +
+                        'FROM ' + Tables.Items[TabName] + ' ' +
+                        'ORDER BY ' + BF.guarant_period + ' ASC';
         FDQ.Open;
         if Not FDQ.IsEmpty then
         begin
@@ -1254,14 +1435,14 @@ begin
           FDQ.First;
           while Not FDQ.Eof do
           begin
-            StrValue := FDQ.FieldByName(arBuyTabFieldsName[5]).AsString;
+            StrValue := FDQ.FieldByName(BF.guarant_period).AsString;
             if StrValue <> '' then DBCmBoxGuarantPeriod.Items.Add(StrValue);
             FDQ.Next;
           end;
         end;
       end;
 
-    tnSellTable:
+    tSellTab:
       begin
         // in the future will be completed
       end;
@@ -1271,35 +1452,44 @@ end;
 procedure TFrmMain.SetFieldsSearch(TabName: TTablesName);
 var
    i: ShortInt;
-   field: string;
+   Field: TBuyFieldsType;
+   FieldName, FieldCap: string;
 begin
 
   JvChCmBoxFieldsSearchBuy.Clear;
   JvChCmBoxFieldsSearchSell.Clear;
 
-  for i := 0 to High(arBuyTabFieldsName) do
+  // Перечисляю и заполняю по Типам , что бы сохранить уникальный порядок списка
+  for i := 0 to Ord(High(TBuyFieldsType)) do
   begin
-    field := arBuyTabFieldsName[i];
-    if CheckFlag(BuyFields.items[field].FPD_FLAGS, FPD_FIELD_SEARCHE) then
+    //field := arBuyTabFieldsName[i];
+    Field := TBuyFieldsType(i);
+    if fpSearch in BuyFields.items[Field].preset then
     begin
-      BuyFieldsSearch.Add(BuyFields.items[field].Caption, field);
-      JvChCmBoxFieldsSearchBuy.Items.Add(BuyFields.items[field].Caption);
+      FieldName := BuyFields.items[field].Name;
+      FieldCap  := BuyFields.items[Field].Caption;
+      BuyFieldsSearch.Add(FieldCap, FieldName);
+      JvChCmBoxFieldsSearchBuy.Items.Add(FieldCap);
     end;
   end;
 
-  for i := 0 to JvChCmBoxFieldsSearchBuy.Items.Count -1 do
+  // необходимо пербрать в цикле повторно и проставить checked
+  // т.к. в цикле при запонении JvChCmBoxFieldsSearchBuy checked не проставляются видимо Bug
+  for i := 0 to Ord(High(TBuyFieldsType)) do
   begin
-    field := JvChCmBoxFieldsSearchBuy.Items[i];
-    field := BuyFieldsSearch.Items[field];
-    JvChCmBoxFieldsSearchBuy.Checked[i] := CheckFlag(BuyFields.Items[field].FPD_FLAGS, FPD_FIELD_CHECKET);
+    if fpChecket in BuyFields.items[TBuyFieldsType(i)].preset then
+    begin
+      FieldCap :=BuyFields.items[TBuyFieldsType(i)].Caption;
+      var x := JvChCmBoxFieldsSearchBuy.Items.IndexOf( FieldCap);
+      if x <> -1 then JvChCmBoxFieldsSearchBuy.Checked[x] := true;
+    end;
   end;
-
 
      // for i := 1 to High(arBuyTabFieldsCaption) do
      //              JvChCmBoxFieldsSearch.Items.Add(arBuyTabFieldsCaption[i]);
 
-  for i := 1 to High(arSellTabFieldsCaption) do
-    JvChCmBoxFieldsSearchSell.Items.Add(arSellTabFieldsCaption[i]);
+  for i := 1 to High(arSellFieldsCaption) do
+    JvChCmBoxFieldsSearchSell.Items.Add(arSellFieldsCaption[i]);
 
 
   //if JvChCmBoxFieldsSearch.Items.Count <> 0 then
@@ -1311,32 +1501,52 @@ procedure TFrmMain.SetFieldsDefault(TabName: TTablesName);
 var
   i: ShortInt;
 begin
-  if TabName in [tnAll, tnBuyTable] then
+  if TabName in [tAll, tBuyTab] then
   begin
-    for i := 0 to High(arBuyTabFieldsName) do
+    for i := 0 to ord(High(TBuyFieldsType)) do
     begin
+      var bf := TBuyFieldsType(i);
       with JvDBGBuy.Columns.Add do
       begin
-        FieldName        := arBuyTabFieldsName[i];
-        Title.Caption    := arBuyTabFieldsCaption[i];
-        Title.Alignment  := arBuyFieldsAlignment[i];
+        FieldName        := BuyFields.Items[bf].Name;
+        Title.Caption    := BuyFields.Items[bf].Caption;
+        Title.Alignment  := BuyFields.Items[bf].DefAlignment;
         Title.Font.Style := [fsBold];
         //Title.Font.Size  := 10;
-        Alignment        := arBuyFieldsAlignment[i];
-        Width            := arBuyFieldsWidth[i];
+        Alignment        := BuyFields.Items[bf].DefAlignment;
+        Width            := BuyFields.Items[bf].DefWidth;
         if i = 0 then Visible := false else Visible := true;
       end;
+
+      // Create sorted inedex
+      with FDQBuy.Indexes.Add do
+      begin
+        Name    := BuyFields.Items[bf].Name + '_index_asc';
+        Fields  := BuyFields.Items[bf].Name;
+        Active  := True;
+      end;
+      mm.Lines.Add(BuyFields.Items[bf].Name + '_index_asc');
+
+      with FDQBuy.Indexes.Add do
+      begin
+        Name    := BuyFields.Items[bf].Name + '_index_desc';
+        Fields  := BuyFields.Items[bf].Name;
+        Options := [soDescending];
+        Active  := True;
+      end;
+      mm.Lines.Add(BuyFields.Items[bf].Name + '_index_desc');
+
     end;
   end;
 
-  if TabName in [tnAll, tnSellTable] then
+  if TabName in [tAll, tSellTab] then
   begin
-    for i := 0 to High(arSellTabFieldsName) do
+    for i := 0 to High(arSellFields) do
     begin
       with JvDBGSell.Columns.Add do
       begin
-        FieldName        := arSellTabFieldsName[i];
-        Title.Caption    := arSellTabFieldsCaption[i];
+        FieldName        := arSellFields[i];
+        Title.Caption    := arSellFieldsCaption[i];
         Title.Font.Style := [fsBold];
         //Title.Font.Size  := 10;
         Title.Alignment  := arSellFieldsAlignment[i];
@@ -1355,9 +1565,14 @@ begin
   jvdpeGuaranteeLastDate.Date := IncMonth(JvdpeDateBuy.Date, StrToInt(DBCmBoxGuarantPeriod.Text));
 end;
 
+procedure TFrmMain.SetSortIndexes;
+begin
+  //
+end;
+
 procedure TFrmMain.SetControlSelectedGroups;
 begin
-  FDQ.SQL.Text :=  'SELECT * FROM ' + arTabNameStr[tnGroupsTable];
+  FDQ.SQL.Text :=  'SELECT * FROM ' + Tables.Items[tGroupsTab];
   FDQ.Open;
   FDQ.First;
   if Not FDQ.IsEmpty then
@@ -1421,33 +1636,48 @@ end;
 procedure TFrmMain.UpdateMainTable;
 var
   SqlStr: String;
+  ADD_OR: String;
   GroupsChecked: Boolean;
+  SubStr: String;
 begin
+  //var GroupsTab         := Tables.Items[tGroupsTab];
+  var Buy_Image_id      := Tables.Items[tBuyTab] + '.' + BuyFieldsName.image_id;
+  var Image_id          := Tables.Items[tImagesTab] + '.' + ImagesFieldsName.id;
+  var Buy_id            := Tables.Items[tBuyTab] + '.' + BuyFieldsName.id;
+  var BuyGroup_group_id := Tables.Items[tBuyGroupTab] + '.' + BuyGroupFieldsName.group_id;
+  var BuyGroup_buy_id   := Tables.Items[tBuyGroupTab] + '.' + BuyGroupFieldsName.buy_id;
+  //GroupsChecked
+
   FDQBuy.SQL.Clear;
   GroupsChecked := false;
-  SqlStr := 'SELECT * FROM BuyTab LEFT OUTER JOIN ImagesTab ' +
-              'ON BuyTab.image_id = ImagesTab.id';
 
-  if JvChCmBoxViewSelectedGroups.CheckedCount > 0 then
-  begin
-    GroupsChecked := true;
-    SqlStr := SqlStr + ', ' + arTabNameStr[tnBuyGroupTable];
-  end;
+  SqlStr := 'SELECT DISTINCT' +#13#10 + BuyFieldsList + 'FROM ' + #13#10 +
+            '  ' + Tables.Items[tBuyTab] + ' LEFT OUTER JOIN '+ Tables.Items[tBuyGroupTab] +
+            ' ON ' + BuyGroup_buy_id + ' = ' + Buy_id + #13#10 +
+            '  LEFT OUTER JOIN ' + Tables.Items[tImagesTab] +
+            ' ON ' + Buy_Image_id + ' = ' + Image_id;
 
   FDQBuy.SQL.Add(SqlStr);
 
-  if GroupsChecked then
+  if JvChCmBoxViewSelectedGroups.CheckedCount > 0 then
   begin
     FDQBuy.SQL.Add('WHERE');
-    SqlStr := '(BuyGrouptab.buy_id = BuyTab.id)';
+    SqlStr := '   ' + BuyGroup_group_id + ' IN ()';
+    SubStr := '';
+    var comma := '';
     for var FieldPair in GroupsSearch do
     begin
       if FieldPair.Value.checket then
-        SqlStr := SqlStr + ' AND BuyGrouptab.group_id = ' +
-                   FieldPair.Value.id.ToString
+      begin
+        SubStr := SubStr + comma + FieldPair.Value.id.ToString;
+        comma := ', ';
+      end;
     end;
+    SqlStr := StringReplace(SqlStr, '()', '(' + SubStr + ')', []);
     FDQBuy.SQL.Add(SqlStr);
   end;
+
+  FDQBuy.SQL.Add('ORDER BY ' + Buy_id + ' ASC');
 
   // for debug
   mm.Lines.Add('');
